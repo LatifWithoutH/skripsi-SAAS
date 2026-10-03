@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Tim | SaaS Skripsi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="flex">
+    <%- include('../partials/_sidebar', { isTenant: true }) %>
+    
+    <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
+      <%- include('../partials/_header', { user: user }) %>
+
+      <main class="flex-1 p-6 md:p-8">
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Kelola Tim & Akses</h1>
+            <p class="text-gray-500">Atur hak akses, role, dan status akun anggota tim institusi Anda.</p>
+          </div>
+          
+          <!-- ✅ PERBAIKAN: Tombol ini sekarang memicu modal, bukan redirect ke dashboard -->
+          <button onclick="toggleInviteModal()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Undang Tim Baru
+          </button>
+        </div>
+
+        <!-- Summary Cards (DINAMIS DARI DATABASE) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="users" class="w-6 h-6"></i></div>
+            <div>
+              <p class="text-sm text-gray-500 font-medium">Total Anggota</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.total %></p>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+            <div>
+              <p class="text-sm text-gray-500 font-medium">Akses Aktif</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.active %></p>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="mail-warning" class="w-6 h-6"></i></div>
+            <div>
+              <p class="text-sm text-gray-500 font-medium">Menunggu Konfirmasi</p>
+              <p class="text-2xl font-bold text-gray-900"><%= stats.pending %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <% if (users && users.length > 0) { %>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100 uppercase text-xs tracking-wider">
+                  <tr>
+                    <th class="px-6 py-4">Pengguna</th>
+                    <th class="px-6 py-4">Role & Hak Akses</th>
+                    <th class="px-6 py-4">Unit / Fakultas</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4">Bergabung</th>
+                    <th class="px-6 py-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  
+                  <% users.forEach(function(u) { %>
+                    <tr class="hover:bg-gray-50 transition-colors <%= u.status === 'pending_invite' ? 'bg-amber-50/30' : '' %>">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="h-9 w-9 <%= u.status === 'pending_invite' ? 'bg-gray-100 text-gray-500' : 'bg-indigo-100 text-indigo-600' %> rounded-full flex items-center justify-center font-bold text-sm">
+                            <%= u.name.charAt(0).toUpperCase() %>
+                          </div>
+                          <div>
+                            <p class="font-semibold text-gray-900"><%= u.name %></p>
+                            <p class="text-xs text-gray-500"><%= u.email %></p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold 
+                          <%= u.role_name === 'tenant_owner' ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-blue-100 text-blue-700 border border-blue-200' %>">
+                          <i data-lucide="<%= u.role_name === 'tenant_owner' ? 'crown' : 'shield' %>" class="w-3 h-3"></i> 
+                          <%= u.role_name ? u.role_name.replace('_', ' ').toUpperCase() : 'UNKNOWN' %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-gray-600">
+                        <%= u.unit_name ? u.unit_name + ' (' + u.unit_code + ')' : 'Pusat (Semua Unit)' %>
+                      </td>
+                      <td class="px-6 py-4">
+                        <% if (u.status === 'active') { %>
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                          </span>
+                        <% } else if (u.status === 'pending_invite') { %>
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                            <i data-lucide="clock" class="w-3 h-3"></i> Menunggu
+                          </span>
+                        <% } else { %>
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span> <%= u.status %>
+                          </span>
+                        <% } %>
+                      </td>
+                      <td class="px-6 py-4 text-gray-500">
+                        <%= new Date(u.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                      </td>
+                      <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                          <% if (u.status === 'pending_invite') { %>
+                            <form action="/users/<%= u.id %>/activate" method="POST" class="inline" title="Aktifkan User">
+                              <button type="submit" class="p-2 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-colors">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                              </button>
+                            </form>
+                            <form action="/users/<%= u.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Yakin ingin membatalkan undangan untuk <%= u.email %>?');" title="Batalkan Undangan">
+                              <button type="submit" class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                              </button>
+                            </form>
+                          <% } else if (u.role_name !== 'tenant_owner') { %>
+                            <button class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit Role">
+                              <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            </button>
+                            <button class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Nonaktifkan Akses">
+                              <i data-lucide="user-x" class="w-4 h-4"></i>
+                            </button>
+                          <% } else { %>
+                            <button class="p-2 text-gray-400 cursor-not-allowed" title="Tidak dapat diubah">
+                              <i data-lucide="lock" class="w-4 h-4"></i>
+                            </button>
+                          <% } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <!-- Empty State jika belum ada user lain -->
+            <div class="p-12 text-center">
+              <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="users" class="w-8 h-8 text-gray-400"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Belum ada anggota tim</h3>
+              <p class="text-gray-500 mt-1 mb-4">Mulai undang rekan kerja atau staf fakultas Anda.</p>
+              <button onclick="toggleInviteModal()" class="text-indigo-600 font-semibold hover:underline">Undang Tim Pertama</button>
+            </div>
+          <% } %>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: UNDANG TIM BARU (DITAMBAHKAN DI SINI) -->
+  <!-- ========================================== -->
+  <div id="inviteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all">
+      <!-- Header Modal -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+            <i data-lucide="mail-plus" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900">Undang Anggota Tim</h3>
+        </div>
+        <button onclick="toggleInviteModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+  
+      <!-- Body Modal (Form) -->
+      <form action="/team/invite" method="POST" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email Tim IT / Admin</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="tim.it@kampus.ac.id">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- DROPDOWN ROLE -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Hak Akses (Role)</label>
+            <div class="relative">
+              <select name="role_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
+                <% if (locals.roles && roles.length > 0) { %>
+                  <% roles.forEach(function(role) { %>
+                    <option value="<%= role.id %>">
+                      <%= role.name.replace('_', ' ').toUpperCase() %>
+                    </option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- DROPDOWN UNIT -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Unit / Fakultas (Opsional)</label>
+            <div class="relative">
+              <select name="unit_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
+                <option value="">Tidak terikat (Akses Seluruh Unit)</option>
+                <% if (locals.units && units.length > 0) { %>
+                  <% units.forEach(function(unit) { %>
+                    <option value="<%= unit.id %>">
+                      <%= unit.name %> (<%= unit.code %>)
+                    </option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Keamanan -->
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 items-start">
+          <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="text-sm font-medium text-blue-900">Keamanan Terjamin</p>
+            <p class="text-xs text-blue-700 mt-0.5">User yang diundang terikat pada Tenant ID institusi Anda. Mereka tidak akan bisa melihat atau mengakses data institusi lain.</p>
+          </div>
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+          <button type="button" onclick="toggleInviteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+          <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
+            <i data-lucide="send" class="w-4 h-4"></i> Kirim Undangan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- SCRIPT UNTUK MODAL -->
+  <script>
+    function toggleInviteModal() {
+      const modal = document.getElementById('inviteModal');
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+  
+    // Menutup modal jika user mengklik area gelap di luar form (backdrop)
+    document.getElementById('inviteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        toggleInviteModal();
+      }
+    });
+
+    // Inisialisasi ikon Lucide
+    lucide.createIcons();
+  </script>
+</body>
+</html>

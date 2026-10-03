@@ -1,0 +1,38 @@
+# ==========================================
+# KEAMANAN & SENSITIVE DATA (SANGAT PENTING)
+# ==========================================
+# Private Keys & Certificates (Mencegah kebocoran SSL)
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Environment Variables (Mencegah kebocoran kredensial DB/Email)
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# DEPENDENCIES & BUILD
+# ==========================================
+node_modules/
+dist/
+build/
+
+# ==========================================
+# BACKUP & LOG FILES (File sampah skripsi)
+# ==========================================
+backup.sh
+BACKUP_*.txt
+struktur.txt
+*.log
+npm-debug.log*
+
+# ==========================================
+# OS & IDE FILES
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

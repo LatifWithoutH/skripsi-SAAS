@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Admin | SaaS Skripsi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="flex">
+    <%- include('../partials/_sidebar', { isPlatform: true }) %>
+    
+    <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
+      <%- include('../partials/_header', { user: { name: 'Super Admin', role: 'Platform Owner' } }) %>
+
+      <main class="flex-1 p-6 md:p-8">
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-gray-900">Platform Overview</h1>
+          <p class="text-gray-500">Monitoring keseluruhan sistem SaaS dan tenant.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <p class="text-sm font-medium text-gray-500 mb-1">Total Tenant</p>
+            <p class="text-3xl font-bold text-gray-900">12</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <p class="text-sm font-medium text-gray-500 mb-1">Total Pengguna</p>
+            <p class="text-3xl font-bold text-gray-900">1,402</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <p class="text-sm font-medium text-gray-500 mb-1">Server Load</p>
+            <p class="text-3xl font-bold text-emerald-600">24%</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <p class="text-sm font-medium text-gray-500 mb-1">Insiden Keamanan</p>
+            <p class="text-3xl font-bold text-gray-900">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-800">Daftar Tenant Terdaftar</h3>
+          </div>
+          <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50 text-gray-500 font-medium">
+              <tr>
+                <th class="px-6 py-3">Nama Institusi</th>
+                <th class="px-6 py-3">Admin Email</th>
+                <th class="px-6 py-3">Bergabung</th>
+                <th class="px-6 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-900">Universitas Nusantara</td>
+                <td class="px-6 py-4 text-gray-600">admin@uniba.ac.id</td>
+                <td class="px-6 py-4 text-gray-500">01 Sep 2026</td>
+                <td class="px-6 py-4"><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

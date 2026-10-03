@@ -1,0 +1,227 @@
+<aside class="w-64 bg-slate-950 text-slate-400 flex flex-col h-screen fixed left-0 top-0 border-r border-slate-800/60 hidden md:flex z-30">
+  
+  <!-- 1. Brand Header (Lebih Clean) -->
+  <div class="h-16 flex items-center px-6 border-b border-slate-800/60 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/20">
+        <i data-lucide="box" class="w-5 h-5 text-white"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold text-white tracking-wide leading-none">SI-MITRA</span>
+        <span class="text-[10px] text-slate-500 font-medium tracking-wider mt-0.5">DUDIKA PANEL</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Main Navigation (Spacing lebih rapat & terkelompok rapi) -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
+    
+    <!-- GROUP: UTAMA -->
+    <div>
+      <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Menu Utama</p>
+      <div class="space-y-1">
+        <a href="/dashboard" data-path="/dashboard" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <a href="/kerjasama" data-path="/kerjasama" class="nav-link flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <i data-lucide="file-signature" class="w-4 h-4"></i>
+            <span>Kerjasama</span>
+          </div>          
+        </a>
+
+        <% if (typeof isTenant !== 'undefined' && isTenant) { %>
+          <a href="/mitra" data-path="/mitra" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
+            <span>Data Mitra</span>
+          </a>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- GROUP: KELOLA DATA -->
+    <div>
+      <p class="px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2">Kelola Data</p>
+
+   
+      <!-- Data Mitra (Tenant Only) -->
+      <% if (typeof isTenant !== 'undefined' && isTenant) { %>
+        <!-- ✅ BARU DITAMBAHKAN: Kelola Tim & Akses (Menuju /users) -->
+        <a href="/users" data-path="/users" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-all">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span class="flex-1">Kelola Tim & Akses</span>
+        </a>
+      <% } %>
+
+      <!-- Arsip Dokumen -->
+      <a href="/dokumen" data-path="/dokumen" class="nav-link flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-all">
+        <i data-lucide="folder-archive" class="w-4 h-4"></i>
+        <span class="flex-1">Arsip Dokumen</span>
+      </a>
+    </div>
+
+    <!-- GROUP: ADMINISTRASI -->
+    <div>
+      <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Administrasi</p>
+      <div class="space-y-1">
+        <a href="/laporan" data-path="/laporan" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>Laporan</span>
+        </a>
+
+        <a href="/log-aktivitas" data-path="/log-aktivitas" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+          <i data-lucide="history" class="w-4 h-4"></i>
+          <span>Log Aktivitas</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- GROUP: PLATFORM ADMIN (Conditional) -->
+    <% if (typeof isPlatform !== 'undefined' && isPlatform) { %>
+    <div>
+      <p class="px-3 text-[10px] font-bold text-amber-500/70 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+        <i data-lucide="shield" class="w-3 h-3"></i> Platform Owner
+      </p>
+      <div class="space-y-1">
+        <a href="/platform/tenants" data-path="/platform/tenants" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
+          <span>Kelola Tenant</span>
+        </a>
+      </div>
+    </div>
+    <% } %>
+  </nav>
+
+  <!-- 3. Footer: Compact & Unified (User + Status) -->
+  <div class="p-3 border-t border-slate-800/60 shrink-0">
+    <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-800/60">
+      <!-- User Info -->
+      <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-800/60">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md shrink-0">
+          <%= (typeof user !== 'undefined' && user.name ? user.name : 'A').charAt(0).toUpperCase() %>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-200 truncate">
+            <%= typeof user !== 'undefined' && user.name ? user.name : 'Administrator' %>
+          </p>
+          <p class="text-[10px] text-slate-500 truncate">
+            <%= typeof user !== 'undefined' && user.role ? user.role : 'Super Admin' %>
+          </p>
+        </div>
+      </div>
+      
+      <!-- Status & Logout (Side by side) -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-[10px] font-medium text-emerald-400">Sistem Aman</span>
+        </div>
+        <form action="/logout" method="POST">
+          <button type="submit" title="Keluar" class="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-all">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div</div>
+</aside>
+
+<!-- Mobile Bottom Navigation (Diperbaiki alignment-nya) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 z-40 pb-safe">
+  <div class="grid grid-cols-4 h-16">
+    <a href="/dashboard" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Home</span>
+    </a>
+    <a href="/kerjasama" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
+      <i data-lucide="file-signature" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">MoU</span>
+    </a>
+    <a href="/notifikasi" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors relative">
+      <div class="relative">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-950"></span>
+      </div>
+      <span class="text-[10px] font-medium">Notif</span>
+    </a>
+    <a href="/pengaturan" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Profil</span>
+    </a>
+  </div>
+</nav>
+
+<style>
+  /* Custom Scrollbar agar lebih rapi di sidebar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(51 65 85);
+    border-radius: 20px;
+  }
+
+  /* Default state: Subtle */
+  .nav-link {
+    color: rgb(148 163 184); /* slate-400 */
+  }
+  .nav-link:hover {
+    background-color: rgb(30 41 59); /* slate-800 */
+    color: rgb(241 245 249); /* slate-100 */
+  }
+  
+  /* Active state: Modern & Clean (No heavy gradient) */
+  .nav-link.active {
+    background-color: rgba(99, 102, 241, 0.1); /* indigo-500/10 */
+    color: rgb(129 140 248); /* indigo-400 */
+    border-left: 3px solid rgb(99, 102, 241); /* indigo-500 */
+    font-weight: 600;
+  }
+  .nav-link.active i {
+    color: rgb(129 140 248);
+  }
+
+  /* Mobile nav active state */
+  .mobile-nav.active {
+    color: rgb(129 140 248);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    
+    // Helper function untuk mencocokkan path dengan lebih akurat
+    const isActive = (linkPath) => {
+      if (linkPath === '/') return currentPath === '/';
+      return currentPath === linkPath || currentPath.startsWith(linkPath + '/');
+    };
+
+    // Desktop Sidebar
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const linkPath = link.getAttribute('data-path');
+      if (linkPath && isActive(linkPath)) {
+        link.classList.add('active');
+      }
+    });
+    
+    // Mobile Bottom Nav
+    document.querySelectorAll('.mobile-nav').forEach(link => {
+      const linkPath = new URL(link.href).pathname;
+      if (isActive(linkPath)) {
+        link.classList.add('active');
+      }
+    });
+    
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
+</script>

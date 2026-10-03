@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard <%= isFacultyOperator ? 'Fakultas' : 'Tenant' %> | SaaS Skripsi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="flex">
+    <%- include('../partials/_sidebar', { isTenant: true, isFacultyOperator: isFacultyOperator }) %>
+    
+    <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
+      
+      <!-- PERBAIKAN: Menggunakan data user dinamis dari controller -->
+      <%- include('../partials/_header', { user: user }) %>
+
+      <!-- NOTIFIKASI SUKSES (Baru atau Resend) -->
+      <% if (locals.success === 'true' || locals.success === 'resent') { %>
+        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-start gap-3 mx-6 mt-6">
+          <i data-lucide="check-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-semibold">
+              <%= locals.success === 'resent' ? 'Undangan berhasil dikirim ULANG ke' : 'Undangan berhasil dikirim ke' %> 
+              <%= locals.email %>!
+            </p>
+            <p class="text-sm mt-1">Silakan cek inbox email Anda (termasuk folder Spam) untuk mendapatkan password sementara.</p>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- NOTIFIKASI: USER SUDAH AKTIF -->
+      <% if (locals.error === 'user_active') { %>
+        <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg flex items-center gap-2 mx-6 mt-6">
+          <i data-lucide="info" class="w-5 h-5"></i>
+          <p>Akun untuk <strong><%= locals.email %></strong> sudah aktif. Silakan minta pengguna tersebut untuk login atau lakukan reset password.</p>
+        </div>
+      <% } %>
+
+      <!-- NOTIFIKASI LAINNYA -->
+      <% if (locals.error && locals.error !== 'user_active') { %>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 mx-6 mt-6">
+          <i data-lucide="alert-circle" class="w-5 h-5"></i>
+          <% if (locals.error === 'email_failed') { %>
+            User berhasil dibuat, tetapi email gagal terkirim. Cek konfigurasi SMTP.
+          <% } else if (locals.error === 'invalid_role') { %>
+            Role yang dipilih tidak valid.
+          <% } else if (locals.error === 'invalid_unit') { %>
+            Unit yang dipilih tidak valid.
+          <% } else { %>
+            Terjadi kesalahan pada server. Silakan coba lagi.
+          <% } %>
+        </div>
+      <% } %>
+
+      <main class="flex-1 p-6 md:p-8">
+        <div class="mb-8 flex justify-between items-end">
+          <div>
+            <!-- Judul Dinamis -->
+            <h1 class="text-2xl font-bold text-gray-900">
+              Ringkasan <%= isFacultyOperator ? 'Fakultas' : 'Institusi' %>
+            </h1>
+            <p class="text-gray-500">
+              Pantau kesehatan dan perkembangan data <%= isFacultyOperator ? 'fakultas' : 'institusi' %> Anda secara real-time.
+            </p>
+          </div>
+          
+          <!-- Tombol Undang Tim (HANYA untuk Tenant Owner) -->
+          <% if (!isFacultyOperator) { %>
+            <button onclick="toggleModal()" class="hidden sm:flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Undang Tim IT / Admin
+            </button>
+          <% } %>
+        </div>
+
+        <!-- Banner Onboarding (Dinamis) -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white mb-8 shadow-lg shadow-indigo-200">
+          <div class="flex items-start gap-4">
+            <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
+              <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-1">
+                Selamat Datang, <%= user.name %>!
+              </h3>
+              <p class="text-indigo-100 text-sm mb-3 max-w-2xl">
+                <%= isFacultyOperator 
+                  ? 'Anda memiliki akses untuk mengelola data mitra dan kerjasama khusus untuk fakultas Anda.' 
+                  : 'Sebagai inisiator, Anda dapat mengelola langganan atau mendelegasikan tugas teknis kepada tim IT kampus Anda.' %>
+              </p>
+              <div class="flex gap-3">
+                <button class="bg-white text-indigo-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-colors">Lihat Panduan</button>
+                <button class="bg-indigo-700/50 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors border border-indigo-400/30">
+                  Atur Profil <%= isFacultyOperator ? 'Fakultas' : 'Institusi' %>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards (DINAMIS BERDASARKAN ROLE) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          
+          <!-- Card 1: Total Mitra -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-medium text-gray-500">
+                <%= isFacultyOperator ? 'Mitra di Fakultas Anda' : 'Total Mitra Kerja Sama' %>
+              </h3>
+              <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-gray-900"><%= stats.totalMitra %></p>
+            <p class="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-3 h-3"></i> 
+              <%= isFacultyOperator ? 'Fakultas ' + user.name : '+3 institusi bulan ini' %>
+            </p>
+          </div>
+          
+          <!-- Card 2: Conditional (Kerjasama Aktif untuk Faculty / Unit Aktif untuk Owner) -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+              <% if (isFacultyOperator) { %>
+                <h3 class="text-sm font-medium text-gray-500">Kerjasama Aktif</h3>
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                  <i data-lucide="file-signature" class="w-5 h-5"></i>
+                </div>
+              <% } else { %>
+                <h3 class="text-sm font-medium text-gray-500">Unit / Fakultas Aktif</h3>
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                  <i data-lucide="building-2" class="w-5 h-5"></i>
+                </div>
+              <% } %>
+            </div>
+            
+            <% if (isFacultyOperator) { %>
+              <p class="text-3xl font-bold text-gray-900"><%= stats.totalKerjasama %></p>
+              <p class="text-xs text-gray-400 mt-1">MoU/MoA berjalan di fakultas Anda</p>
+            <% } else { %>
+              <p class="text-3xl font-bold text-gray-900"><%= stats.totalUnits %></p>
+              <p class="text-xs text-gray-400 mt-1">Unit internal yang terdaftar di institusi Anda</p>
+            <% } %>
+          </div>
+
+          <!-- Card 3: Status Sistem (Sama untuk semua) -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-medium text-gray-500">Status Sistem & Langganan</h3>
+              <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-gray-900"><%= stats.systemStatus %></p>
+            <p class="text-xs text-gray-400 mt-1">Terakhir dicek: <%= stats.lastAudit %></p>
+          </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Aktivitas Penting Terbaru</h3>
+            <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Lihat Log Lengkap</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 text-gray-500 font-medium">
+                <tr>
+                  <th class="px-6 py-3">Unit / Pengguna</th>
+                  <th class="px-6 py-3">Aktivitas</th>
+                  <th class="px-6 py-3">Waktu</th>
+                  <th class="px-6 py-3">Dampak</th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-100">
+                <% if (typeof recentLogs !== 'undefined' && recentLogs.length > 0) { %>
+                  <% recentLogs.forEach(function(log) { %>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                      <td class="px-6 py-4 font-medium text-gray-900">
+                        <!-- Fallback ke 'Sistem' jika unit_name tidak ada -->
+                        <%= log.unit_name || user.name || 'Sistem' %>
+                      </td>
+                      <td class="px-6 py-4 text-gray-600">
+                        <%= log.details || log.action %>
+                      </td>
+                      <td class="px-6 py-4 text-gray-500 text-xs">
+                        <%= new Date(log.created_at).toLocaleString('id-ID', { 
+                          day: 'numeric', month: 'short', year: 'numeric', 
+                          hour: '2-digit', minute: '2-digit' 
+                        }) %>
+                      </td>
+                      <td class="px-6 py-4">
+                        <% 
+                          let badgeClass = 'bg-gray-100 text-gray-700';
+                          let badgeText = 'Informasi';
+                          const action = (log.action || '').toUpperCase();
+                          if (action.includes('CREATE') || action.includes('ADD') || action.includes('INVITE')) {
+                            badgeClass = 'bg-emerald-100 text-emerald-700';
+                            badgeText = 'Data Bertambah';
+                          } else if (action.includes('LOGIN') || action.includes('AUTH')) {
+                            badgeClass = 'bg-blue-100 text-blue-700';
+                            badgeText = 'Akses Masuk';
+                          } else if (action.includes('FAIL') || action.includes('ERROR') || action.includes('DELETE')) {
+                            badgeClass = 'bg-red-100 text-red-700';
+                            badgeText = 'Peringatan';
+                          } else if (action.includes('UPDATE')) {
+                            badgeClass = 'bg-amber-100 text-amber-700';
+                            badgeText = 'Pembaruan';
+                          }
+                        %>
+                        <span class="px-2.5 py-1 <%= badgeClass %> rounded-full text-xs font-semibold">
+                          <%= badgeText %>
+                        </span>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" class="px-6 py-10 text-center">
+                      <div class="flex flex-col items-center justify-center text-gray-400">
+                        <i data-lucide="history" class="w-10 h-10 mb-2 text-gray-300"></i>
+                        <p class="text-sm font-medium">Belum ada aktivitas tercatat</p>
+                        <p class="text-xs text-gray-400 mt-1">Aktivitas akan muncul di sini setelah ada tindakan di sistem.</p>
+                      </div>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>              
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+    
+  <!-- MODAL: UNDANG TIM IT / ADMIN (HANYA UNTUK TENANT OWNER) -->
+  <% if (!isFacultyOperator) { %>
+  <div id="inviteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all">
+      <!-- Header Modal -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+            <i data-lucide="mail-plus" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900">Undang Anggota Tim</h3>
+        </div>
+        <button onclick="toggleModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+  
+      <!-- Body Modal (Form) -->
+      <form action="/team/invite" method="POST" class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email Tim IT / Admin</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="tim.it@kampus.ac.id">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- DROPDOWN ROLE -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Hak Akses (Role)</label>
+            <div class="relative">
+              <select name="role_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
+                <% if (locals.roles && roles.length > 0) { %>
+                  <% roles.forEach(function(role) { %>
+                    <option value="<%= role.id %>">
+                      <%= role.name.replace('_', ' ').toUpperCase() %>
+                    </option>
+                  <% }); %>
+                <% } else { %>
+                  <option value="">Tidak ada role tersedia</option>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- DROPDOWN UNIT -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Unit / Fakultas (Opsional)</label>
+            <div class="relative">
+              <select name="unit_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
+                <option value="">Tidak terikat (Akses Seluruh Unit)</option>
+                <% if (locals.units && units.length > 0) { %>
+                  <% units.forEach(function(unit) { %>
+                    <option value="<%= unit.id %>">
+                      <%= unit.name %> (<%= unit.code %>)
+                    </option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Keamanan -->
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 items-start">
+          <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="text-sm font-medium text-blue-900">Keamanan Terjamin</p>
+            <p class="text-xs text-blue-700 mt-0.5">User yang diundang terikat pada Tenant ID institusi Anda. Mereka tidak akan bisa melihat atau mengakses data institusi lain.</p>
+          </div>
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+          <button type="button" onclick="toggleModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
+          <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
+            <i data-lucide="send" class="w-4 h-4"></i> Kirim Undangan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <% } %>
+  
+  <!-- SCRIPT UNTUK MODAL -->
+  <script>
+    function toggleModal() {
+      const modal = document.getElementById('inviteModal');
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+  
+    document.getElementById('inviteModal')?.addEventListener('click', function(e) {
+      if (e.target === this) {
+        toggleModal();
+      }
+    });
+  </script>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
