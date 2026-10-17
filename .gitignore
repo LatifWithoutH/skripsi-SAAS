@@ -1,0 +1,56 @@
+# ==========================================
+# 1. DEPENDENCIES (JANGAN DI-COMMIT)
+# Ini folder berisi ribuan file yang bisa di-install ulang via npm/pip
+# ==========================================
+node_modules/
+venv/
+.env
+.env.local
+.env.production
+
+# ==========================================
+# 2. KEAMANAN & RAHASIA (SANGAT KRITIS!)
+# Private key SSL dan file konfigurasi rahasia tidak boleh di-upload
+# ==========================================
+*.pem
+*.key
+*.crt
+*.sql
+
+# ==========================================
+# 3. FILE BACKUP LOKAL & SKRIPSI
+# File backup pribadi hanya memenuhi ruang di GitHub
+# ==========================================
+*.backup
+app.js.backup
+BACKUP_SKRIPSI_*.txt
+backup*.sh
+struktur.txt
+*L200239190*.txt
+
+# ==========================================
+# 4. FILE SAMPAH BROWSER & OS
+# Hasil "Save Page As" atau file temporary sistem
+# ==========================================
+skripsi-saas_files/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ==========================================
+# 5. DATA DINAMIS & LOGS
+# File upload user dan log aplikasi tidak perlu di-version control
+# ==========================================
+public/uploads/
+uploads/
+logs/
+*.log
+
+# ==========================================
+# 6. IDE & EDITOR SETTINGS
+# Pengaturan VS Code / PyCharm bersifat lokal
+# ==========================================
+.vscode/
+.idea/
