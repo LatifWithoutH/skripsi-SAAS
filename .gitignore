@@ -53,4 +53,4 @@ logs/
 # Pengaturan VS Code / PyCharm bersifat lokal
 # ==========================================
 .vscode/
-.idea/
+.idea/.html
