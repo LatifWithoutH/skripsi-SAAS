@@ -1,0 +1,52 @@
+{
+  "Versi Lama (Sebelum Hardening)": {
+    "total_skor": 26.299999999999997,
+    "rata_rata_skor": 6.574999999999999,
+    "jumlah_celah": 4,
+    "detail": [
+      {
+        "nama": "State Validation (Zero Trust Login)",
+        "skor": 9.1,
+        "severity": "Critical",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+      },
+      {
+        "nama": "Secure Email Delivery (Managed API)",
+        "skor": 5.3,
+        "severity": "Medium",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+      },
+      {
+        "nama": "Security Headers (Helmet)",
+        "skor": 6.5,
+        "severity": "Medium",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+      },
+      {
+        "nama": "Strict CORS Configuration",
+        "skor": 5.4,
+        "severity": "Medium",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N"
+      }
+    ]
+  },
+  "Versi Baru (Sesudah Hardening)": {
+    "total_skor": 11.9,
+    "rata_rata_skor": 5.95,
+    "jumlah_celah": 2,
+    "detail": [
+      {
+        "nama": "Security Headers (Helmet)",
+        "skor": 6.5,
+        "severity": "Medium",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+      },
+      {
+        "nama": "Strict CORS Configuration",
+        "skor": 5.4,
+        "severity": "Medium",
+        "vektor": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N"
+      }
+    ]
+  }
+}

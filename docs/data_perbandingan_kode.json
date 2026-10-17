@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-12T14:49:37.310338",
+    "old_version": "/home/acer/skripsi-saas/skripsi-saas (copy)",
+    "new_version": "/home/acer/skripsi-saas"
+  },
+  "statistics": {
+    "total_old": 0,
+    "total_new": 0,
+    "delta": 0,
+    "reduction_pct": 0.0,
+    "by_category": {}
+  },
+  "scan_info": {
+    "old": {
+      "files_scanned": 19,
+      "lines_scanned": 1208,
+      "total_findings": 0
+    },
+    "new": {
+      "files_scanned": 42,
+      "lines_scanned": 3010,
+      "total_findings": 0
+    }
+  },
+  "findings_old": [],
+  "findings_new": []
+}

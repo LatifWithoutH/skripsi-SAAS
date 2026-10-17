@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Portal Mitra | SI-MITRA-DUDIKA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+  <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl border border-slate-200">
+    <div class="text-center mb-8">
+      <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="building-2" class="w-7 h-7"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-900">Portal Mitra Industri</h2>
+      <p class="text-slate-500 text-sm mt-1">Masuk untuk mengelola dokumen kerjasama Anda</p>
+    </div>
+
+    <% if (locals.error) { %>
+      <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+        <% if (error === 'invalid_credentials') { %> Email atau password salah.
+        <% } else if (error === 'account_suspended') { %> Akun Anda sedang ditangguhkan.
+        <% } else { %> Terjadi kesalahan sistem.
+        <% } %>
+      </div>
+    <% } %>
+
+    <form action="/portal-mitra/login" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Email Perusahaan</label>
+        <input type="email" name="email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="pic@perusahaan.com">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="••••••••">
+      </div>
+      <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
+        Masuk ke Portal
+      </button>
+    </form>
+  </div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

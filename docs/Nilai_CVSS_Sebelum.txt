@@ -1,0 +1,29 @@
+acer@acer-Aspire-A311-31:~/skripsi-saas$ python3 hitung_cvss.py 
+======================================================================
+🔒 LAPORAN PERHITUNGAN CVSS v3.1 (MULTIPLE FINDINGS)
+======================================================================
+
+[TEMUAN #1] 1. Bypass Validasi Registrasi (Weak Password & Auto-Login)
+Deskripsi   : Attacker bisa mendaftar dengan password lemah ('123') dan langsung mendapatkan sesi login (auto-login) tanpa melalui proses approval admin.
+Vector      : CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+Base Score  : 6.5
+Severity    : Medium
+----------------------------------------------------------------------
+
+[TEMUAN #2] 2. Missing Rate Limiting pada Endpoint Login
+Deskripsi   : Tidak adanya pembatasan percobaan login memungkinkan serangan Brute-Force untuk menebak password pengguna.
+Vector      : CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+Base Score  : 7.5
+Severity    : High
+----------------------------------------------------------------------
+
+[TEMUAN #3] 3. Insecure Direct Object Reference (IDOR) pada Data Mitra
+Deskripsi   : User dari Tenant A dapat mengakses atau memanipulasi data mitra milik Tenant B hanya dengan mengubah parameter ID pada URL.
+Vector      : CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N
+Base Score  : 6.5
+Severity    : Medium
+----------------------------------------------------------------------
+
+📊 RATA-RATA SKOR KEAMANAN SISTEM SEBELUM HARDENING: 6.83
+======================================================================
+acer@acer-Aspire-A311-31:~/skripsi-saas$ 

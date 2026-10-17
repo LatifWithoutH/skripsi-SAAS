@@ -1,0 +1,168 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-12T16:51:43.915926",
+    "methodology": "Object-Oriented Security Control Verification (OWASP Top 10)"
+  },
+  "audit_results": [
+    {
+      "control_name": "Password Hashing (Bcrypt)",
+      "owasp": "A07:2025 - Auth Failures",
+      "cwe": "CWE-521",
+      "old_version": {
+        "present": false,
+        "evidence": "Tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Ditemukan di controllers/partnerAuthController.js",
+        "file": "controllers/partnerAuthController.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "State Validation (Zero Trust Login)",
+      "owasp": "A01:2025 - Broken Access Control",
+      "cwe": "CWE-862",
+      "old_version": {
+        "present": false,
+        "evidence": "Validasi status user tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Gatekeeper untuk status 'pending_approval' ditemukan.",
+        "file": "controllers/authController.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Multi-Tenant Isolation (Row-Level Security)",
+      "owasp": "A01:2025 - Broken Access Control",
+      "cwe": "CWE-639",
+      "old_version": {
+        "present": false,
+        "evidence": "Tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Ditemukan di controllers/uploadController.js",
+        "file": "controllers/uploadController.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Parameterized Queries (Anti-SQLi)",
+      "owasp": "A03:2025 - Injection",
+      "cwe": "CWE-89",
+      "old_version": {
+        "present": false,
+        "evidence": "Tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Ditemukan di controllers/uploadController.js",
+        "file": "controllers/uploadController.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Secure Session Cookies",
+      "owasp": "A02:2025 - Cryptographic Failures",
+      "cwe": "CWE-1004",
+      "old_version": {
+        "present": false,
+        "evidence": "Konfigurasi cookie session tidak aman/tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Cookie session dikonfigurasi dengan httpOnly dan secure flags.",
+        "file": "app.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "API Rate Limiting",
+      "owasp": "A05:2025 - Security Misconfiguration",
+      "cwe": "CWE-307",
+      "old_version": {
+        "present": false,
+        "evidence": "Mekanisme rate limiting tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "express-rate-limit diimplementasikan pada endpoint autentikasi.",
+        "file": "app.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Security Headers (Helmet)",
+      "owasp": "A05:2025 - Security Misconfiguration",
+      "cwe": "CWE-693",
+      "old_version": {
+        "present": false,
+        "evidence": "Middleware Helmet tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": false,
+        "evidence": "Middleware Helmet tidak ditemukan.",
+        "file": "N/A"
+      },
+      "status": "❌ MISSING (Belum diimplementasi)"
+    },
+    {
+      "control_name": "Comprehensive Audit Logging",
+      "owasp": "A08:2025 - Software/Data Integrity Failures",
+      "cwe": "CWE-778",
+      "old_version": {
+        "present": false,
+        "evidence": "Tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Ditemukan di controllers/uploadController.js",
+        "file": "controllers/uploadController.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Secure Email Delivery (Managed API)",
+      "owasp": "A05:2025 - Security Misconfiguration",
+      "cwe": "CWE-319",
+      "old_version": {
+        "present": false,
+        "evidence": "Masih menggunakan metode email lama (nodemailer SMTP plain).",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Migrasi ke Resend API (Managed Service) terdeteksi.",
+        "file": "utils/emailService.js"
+      },
+      "status": "✅ HARDENED (Ditambahkan)"
+    },
+    {
+      "control_name": "Strict CORS Configuration",
+      "owasp": "A10:2025 - SSRF / Misconfiguration",
+      "cwe": "CWE-942",
+      "old_version": {
+        "present": false,
+        "evidence": "CORS tidak ditemukan atau menggunakan konfigurasi default (berisiko).",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": false,
+        "evidence": "CORS tidak ditemukan atau menggunakan konfigurasi default (berisiko).",
+        "file": "N/A"
+      },
+      "status": "❌ MISSING (Belum diimplementasi)"
+    }
+  ]
+}

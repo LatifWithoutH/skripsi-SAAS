@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-12T16:51:19.120827",
+    "methodology": "Object-Oriented BOLA/IDOR Verification"
+  },
+  "audit_results": [
+    {
+      "control_name": "Mitra Data Isolation (Anti-IDOR)",
+      "owasp": "A01:2025 - Broken Access Control (IDOR)",
+      "cwe": "CWE-639",
+      "old_version": {
+        "present": false,
+        "evidence": "File mitraController.js tidak ditemukan.",
+        "file": "mitraController.js"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Query ke tabel 'mitras' menyertakan scoping 'tenant_id'.",
+        "file": "mitraController.js"
+      },
+      "status": "✅ HARDENED (Mitigasi BOLA/IDOR Ditambahkan)"
+    },
+    {
+      "control_name": "Kerjasama Data Isolation (Anti-IDOR)",
+      "owasp": "A01:2025 - Broken Access Control (IDOR)",
+      "cwe": "CWE-639",
+      "old_version": {
+        "present": false,
+        "evidence": "File kerjasamaController.js tidak ditemukan.",
+        "file": "kerjasamaController.js"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Query ke tabel 'kerjasama' menyertakan scoping 'tenant_id'.",
+        "file": "kerjasamaController.js"
+      },
+      "status": "✅ HARDENED (Mitigasi BOLA/IDOR Ditambahkan)"
+    },
+    {
+      "control_name": "User Management Isolation (Anti-IDOR)",
+      "owasp": "A01:2025 - Broken Access Control (IDOR)",
+      "cwe": "CWE-639",
+      "old_version": {
+        "present": false,
+        "evidence": "File userController.js tidak ditemukan.",
+        "file": "userController.js"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Query ke tabel 'users' menyertakan scoping 'tenant_id'.",
+        "file": "userController.js"
+      },
+      "status": "✅ HARDENED (Mitigasi BOLA/IDOR Ditambahkan)"
+    },
+    {
+      "control_name": "Session-Based Tenant Scoping (Anti-BOLA)",
+      "owasp": "API1:2023 - Broken Object Level Authorization (BOLA)",
+      "cwe": "CWE-639",
+      "old_version": {
+        "present": false,
+        "evidence": "Folder controllers tidak ditemukan.",
+        "file": "N/A"
+      },
+      "new_version": {
+        "present": true,
+        "evidence": "Tenant ID selalu diambil dari Session (req.session), bukan input user.",
+        "file": "controllers/*.js"
+      },
+      "status": "✅ HARDENED (Mitigasi BOLA/IDOR Ditambahkan)"
+    }
+  ]
+}

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYSTEM OVERVIEW | SIMITRADUDIKA</title>
+  
+  <!-- EVA-01 Tactical Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 
+            tech: ['"Share Tech Mono"', 'monospace'],
+            display: ['"Rajdhani"', 'sans-serif'],
+          },
+          colors: {
+            eva: {
+              dark: '#050508',
+              panel: '#0a0a12',
+              purple: '#8b5cf6',
+              green: '#4ade80',
+              orange: '#f97316',
+            }
+          },
+          animation: { 
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'blink': 'blink 1.5s step-end infinite',
+          },
+          keyframes: {
+            blink: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.3' } }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #050508;
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    /* CRT Scanline Effect */
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      z-index: 9999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    /* EVA Glow Effects */
+    .glow-purple { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3), inset 0 0 10px rgba(139, 92, 246, 0.1); }
+    .glow-green { box-shadow: 0 0 15px rgba(74, 222, 128, 0.3), inset 0 0 10px rgba(74, 222, 128, 0.1); }
+    .glow-orange { box-shadow: 0 0 15px rgba(249, 115, 22, 0.3), inset 0 0 10px rgba(249, 115, 22, 0.1); }
+    
+    .text-glow-green { text-shadow: 0 0 8px rgba(74, 222, 128, 0.6); }
+    .text-glow-purple { text-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
+    .text-glow-orange { text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0a0a12; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4ade80; border-radius: 2px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8b5cf6; }
+
+    /* Angular Clip Path for Buttons/Panels */
+    .clip-mecha {
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+  </style>
+</head>
+<body class="font-tech text-eva-green antialiased selection:bg-eva-purple selection:text-white scanlines">
+
+  <!-- 1. TOP NAVIGATION -->
+  <header class="sticky top-0 z-50 bg-eva-panel/90 backdrop-blur-md border-b border-eva-purple/30 glow-purple">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <div class="bg-eva-purple/20 border border-eva-purple p-2 clip-mecha animate-pulse-slow">
+            <i data-lucide="shield-check" class="w-5 h-5 text-eva-green text-glow-green"></i>
+          </div>
+          <div class="flex flex-col">
+            <h1 class="text-xl font-display font-bold text-white tracking-[0.2em] text-glow-purple">SIMITRADUDIKA</h1>
+            <p class="text-[10px] font-tech text-eva-green tracking-[0.3em] uppercase">Platform Admin // System Online</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex items-center gap-3 pr-4 border-r border-eva-purple/30">
+            <div class="text-right">
+              <span class="block text-sm font-display font-bold text-white tracking-wider"><%= typeof user !== 'undefined' && user.name ? user.name : 'SUPER ADMIN' %></span>
+              <span class="block text-xs font-tech text-eva-purple"><%= typeof user !== 'undefined' && user.role ? user.role : 'PLATFORM OWNER' %></span>
+            </div>
+            <div class="w-9 h-9 rounded-none border border-eva-green bg-eva-green/10 flex items-center justify-center text-eva-green font-display font-bold text-lg glow-green">
+              <%= (typeof user !== 'undefined' && user.name ? user.name : 'S').charAt(0).toUpperCase() %>
+            </div>
+          </div>
+          <form action="/platform/logout" method="POST">
+            <button type="submit" class="group flex items-center gap-2 font-tech text-xs tracking-widest text-eva-orange hover:text-red-400 border border-eva-orange/30 hover:border-red-400/60 px-4 py-2 clip-mecha transition-all duration-200 hover:bg-red-500/10">
+              <i data-lucide="log-out" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+              <span class="hidden sm:inline">ABORT / KELUAR</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <div class="mb-8 border-l-4 border-eva-green pl-4">
+      <h2 class="text-3xl font-display font-bold text-white tracking-[0.15em]">PLATFORM OVERVIEW</h2>
+      <p class="font-tech text-eva-green/70 mt-1 text-sm tracking-wider">> MONITORING KESEHATAN SISTEM SAAS // POSTUR KEAMANAN // ANTRIAN PERSETUJUAN</p>
+    </div>
+
+    <!-- Notifikasi -->
+    <% if (locals.success === 'approved') { %>
+      <div class="mb-6 bg-eva-green/10 border border-eva-green/50 text-eva-green px-4 py-3 clip-mecha flex items-center gap-3 font-tech text-sm tracking-wider glow-green animate-blink">
+        <i data-lucide="check" class="w-5 h-5 text-glow-green"></i>
+        <span>> SYSTEM ALERT: TENANT BERHASIL DIAKTIFKAN. AKSES DIBERIKAN.</span>
+      </div>
+    <% } else if (locals.success === 'rejected') { %>
+      <div class="mb-6 bg-eva-orange/10 border border-eva-orange/50 text-eva-orange px-4 py-3 clip-mecha flex items-center gap-3 font-tech text-sm tracking-wider glow-orange">
+        <i data-lucide="x" class="w-5 h-5"></i>
+        <span>> WARNING: PENDAFTARAN TENANT DITOLAK. PROSES DIHENTIKAN.</span>
+      </div>
+    <% } %>
+
+    <!-- 3. STATS ROW 1: METRIK TENANT -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+      <!-- Active -->
+      <div class="group bg-eva-panel border border-eva-purple/40 p-6 clip-mecha hover:border-eva-purple hover:glow-purple transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-eva-purple/10 blur-2xl group-hover:bg-eva-purple/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+          <p class="text-xs font-tech text-eva-purple tracking-[0.2em]">TENANT AKTIF</p>
+          <i data-lucide="building-2" class="w-5 h-5 text-eva-purple"></i>
+        </div>
+        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-purple relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.active : 0 %></p>
+        <p class="text-[10px] font-tech text-eva-purple/60 mt-2 tracking-widest">> INSTITUSI BERJALAN NORMAL</p>
+      </div>
+
+      <!-- Pending -->
+      <div class="group bg-eva-panel border border-eva-green/40 p-6 clip-mecha hover:border-eva-green hover:glow-green transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-eva-green/10 blur-2xl group-hover:bg-eva-green/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+          <p class="text-xs font-tech text-eva-green tracking-[0.2em] animate-pulse">MENUNGGU APPROVAL</p>
+          <i data-lucide="clock" class="w-5 h-5 text-eva-green"></i>
+        </div>
+        <p class="text-4xl font-display font-bold text-eva-green tracking-tight text-glow-green relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.pending : 0 %></p>
+        <p class="text-[10px] font-tech text-eva-green/60 mt-2 tracking-widest">> PERLU TINDAKAN SEGERA</p>
+      </div>
+
+      <!-- Rejected -->
+      <div class="group bg-eva-panel border border-eva-orange/40 p-6 clip-mecha hover:border-eva-orange hover:glow-orange transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-eva-orange/10 blur-2xl group-hover:bg-eva-orange/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+          <p class="text-xs font-tech text-eva-orange tracking-[0.2em]">DITOLAK</p>
+          <i data-lucide="x-circle" class="w-5 h-5 text-eva-orange"></i>
+        </div>
+        <p class="text-4xl font-display font-bold text-white tracking-tight relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.rejected : 0 %></p>
+        <p class="text-[10px] font-tech text-eva-orange/60 mt-2 tracking-widest">> PENDAFTARAN TIDAK DISYAHKAN</p>
+      </div>
+    </div>
+
+    <!-- 4. STATS ROW 2: SKALA EKOSISTEM & KEAMANAN -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      <div class="bg-eva-panel/80 border border-slate-700/50 p-6 clip-mecha hover:border-eva-purple/50 transition-all">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-tech text-slate-400 tracking-[0.2em]">TOTAL PENGGUNA AKTIF</p>
+          <i data-lucide="users" class="w-5 h-5 text-eva-purple"></i>
+        </div>
+        <p class="text-3xl font-display font-bold text-white tracking-tight"><%= typeof globalStats !== 'undefined' ? globalStats.total_active_users : 0 %></p>
+        <p class="text-[10px] font-tech text-slate-500 mt-2 tracking-widest">> STAF & OPERATOR DI SELURUH KAMPUS</p>
+      </div>
+
+      <div class="bg-eva-panel/80 border border-slate-700/50 p-6 clip-mecha hover:border-eva-green/50 transition-all">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-tech text-slate-400 tracking-[0.2em]">TOTAL MITRA TERDAFTAR</p>
+          <i data-lucide="briefcase" class="w-5 h-5 text-eva-green"></i>
+        </div>
+        <p class="text-3xl font-display font-bold text-white tracking-tight"><%= typeof globalStats !== 'undefined' ? globalStats.total_active_mitra : 0 %></p>
+        <p class="text-[10px] font-tech text-slate-500 mt-2 tracking-widest">> PERUSAHAAN DI SELURUH PLATFORM</p>
+      </div>
+
+      <!-- 🛡️ SECURITY METRIC CARD (A09) - EVA STYLE -->
+      <div class="bg-eva-panel border border-eva-orange/40 p-6 clip-mecha hover:border-eva-orange hover:glow-orange transition-all duration-300 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-eva-orange/10 blur-2xl group-hover:bg-eva-orange/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+          <p class="text-xs font-tech text-eva-orange tracking-[0.2em] animate-pulse">INSIDEN KEAMANAN (24H)</p>
+          <i data-lucide="shield-alert" class="w-5 h-5 text-eva-orange"></i>
+        </div>
+        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-orange relative z-10"><%= typeof securityMetrics !== 'undefined' ? securityMetrics.totalIncidents : 0 %></p>
+        <p class="text-[10px] font-tech text-eva-orange/70 mt-2 tracking-widest relative z-10">
+          > <%= typeof securityMetrics !== 'undefined' && securityMetrics.suspiciousIPsCount > 0 ? securityMetrics.suspiciousIPsCount + ' IP MENCURIGAKAN TERDETEKSI' : 'SISTEM RELATIF AMAN' %>
+        </p>
+      </div>
+    </div>
+
+    <!-- 5. MAIN GRID: TABEL APPROVAL & SECURITY ALERTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Kolom Kiri: Antrian Approval -->
+      <div class="lg:col-span-2 bg-eva-panel border border-eva-purple/30 clip-mecha overflow-hidden glow-purple">
+        <div class="px-6 py-4 border-b border-eva-purple/30 flex justify-between items-center bg-eva-purple/5">
+          <div class="flex items-center gap-3">
+            <i data-lucide="inbox" class="w-4 h-4 text-eva-green text-glow-green"></i>
+            <h3 class="font-display font-bold text-white text-sm tracking-[0.15em]">ANTRIAN ONBOARDING TENANT</h3>
+          </div>
+          <span class="text-xs font-tech text-eva-green bg-eva-green/10 border border-eva-green/30 px-3 py-1 tracking-widest">
+            <%= typeof pendingTenants !== 'undefined' ? pendingTenants.length : 0 %> ITEM
+          </span>
+        </div>
+        
+        <% if (typeof pendingTenants !== 'undefined' && pendingTenants.length > 0) { %>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-eva-dark text-xs font-tech uppercase tracking-[0.15em] text-eva-purple border-b border-eva-purple/30">
+                <tr>
+                  <th class="px-6 py-4">Nama Institusi</th>
+                  <th class="px-6 py-4">Email Admin</th>
+                  <th class="px-6 py-4">Paket</th>
+                  <th class="px-6 py-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-eva-purple/10">
+                <% pendingTenants.forEach(function(t) { %>
+                  <tr class="group hover:bg-eva-purple/5 transition-colors duration-200">
+                    <td class="px-6 py-4">
+                      <div class="font-display font-bold text-white tracking-wide"><%= t.name %></div>
+                      <div class="text-[10px] text-eva-green/60 font-tech mt-1">> <%= t.slug %></div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-300 font-tech text-xs"><%= t.admin_email %></td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-2.5 py-1 text-[10px] font-tech font-bold uppercase tracking-widest border <%= t.subscription_plan === 'premium' ? 'bg-eva-purple/10 text-eva-purple border-eva-purple/40' : 'bg-slate-800 text-slate-400 border-slate-600' %>">
+                        <%= t.subscription_plan %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200">
+                        <form action="/platform/tenants/<%= t.id %>/approve" method="POST" class="inline">
+                          <button type="submit" class="flex items-center gap-1.5 px-4 py-1.5 text-[10px] font-tech font-bold uppercase tracking-widest text-eva-dark bg-eva-green hover:bg-green-400 border border-eva-green clip-mecha transition-all active:scale-95 glow-green">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i> APPROVE
+                          </button>
+                        </form>
+                        <form action="/platform/tenants/<%= t.id %>/reject" method="POST" class="inline" onsubmit="return confirm('Yakin menolak <%= t.name %>?');">
+                          <button type="submit" class="flex items-center gap-1.5 px-4 py-1.5 text-[10px] font-tech font-bold uppercase tracking-widest text-eva-orange bg-eva-panel hover:bg-eva-orange/20 border border-eva-orange clip-mecha transition-all active:scale-95">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i> REJECT
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="p-12 text-center border-t border-eva-purple/10">
+            <div class="bg-eva-purple/5 w-16 h-16 border border-eva-purple/30 flex items-center justify-center mx-auto mb-4 clip-mecha">
+              <i data-lucide="check-circle-2" class="w-8 h-8 text-eva-green text-glow-green"></i>
+            </div>
+            <h3 class="text-sm font-display font-bold text-white tracking-[0.2em]">SYSTEM CLEAR</h3>
+            <p class="text-[10px] font-tech text-eva-green/60 mt-2 tracking-widest">> TIDAK ADA PENDAFTARAN BARU</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- 🛡️ Kolom Kanan: TACTICAL SECURITY ALERTS (A09) - EVA STYLE -->
+      <div class="bg-eva-panel border border-eva-orange/30 clip-mecha overflow-hidden flex flex-col glow-orange">
+        <div class="px-6 py-4 border-b border-eva-orange/30 bg-eva-orange/5 flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-eva-orange animate-pulse"></i>
+            <h3 class="font-display font-bold text-white text-sm tracking-[0.15em]">SECURITY ALERTS</h3>
+          </div>
+          <span class="flex h-2 w-2 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-eva-orange opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-eva-orange"></span>
+          </span>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 max-h-[420px]">
+          
+          <% if (typeof securityMetrics !== 'undefined' && securityMetrics.suspiciousIPs && securityMetrics.suspiciousIPs.length > 0) { %>
+            <!-- Brute Force Warning Block -->
+            <div class="bg-eva-orange/10 border border-eva-orange/50 p-3 clip-mecha animate-pulse-slow">
+              <div class="flex items-start gap-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-eva-orange mt-0.5 flex-shrink-0"></i>
+                <div>
+                  <p class="text-xs font-display font-bold text-eva-orange tracking-wider">POTENSI BRUTE FORCE TERDETEKSI</p>
+                  <p class="text-[10px] font-tech text-eva-orange/80 mt-1">
+                    > <%= securityMetrics.suspiciousIPs.length %> IP MEMILIKI >3 PERCOBAAN GAGAL (24J)
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% } %>
+
+          <% if (typeof recentLogs !== 'undefined' && recentLogs.length > 0) { %>
+            <% recentLogs.forEach(function(log) { 
+                // Color-coding logic for EVA theme
+                let isDanger = log.action.includes('FAILED') || log.action.includes('REJECT') || log.action.includes('DELETE') || log.action.includes('UNAUTHORIZED');
+                let borderClass = isDanger ? 'border-eva-orange' : 'border-eva-purple/30';
+                let textClass = isDanger ? 'text-eva-orange' : 'text-eva-green';
+                let icon = isDanger ? 'alert-triangle' : 'activity';
+                let bgHover = isDanger ? 'hover:bg-eva-orange/5' : 'hover:bg-eva-purple/5';
+            %>
+              <div class="flex gap-3 items-start border-l-2 <%= borderClass %> pl-3 py-1 transition-colors <%= bgHover %>">
+                <div class="mt-1.5">
+                  <i data-lucide="<%= icon %>" class="w-3.5 h-3.5 <%= textClass %> <%= isDanger ? 'animate-pulse' : '' %>"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-display font-bold text-white uppercase tracking-wider truncate"><%= log.action.replace(/_/g, ' ') %></p>
+                  <p class="text-[10px] font-tech text-eva-purple mt-1">
+                    ACTOR: <%= log.actor_name || 'SYSTEM' %>
+                  </p>
+                  <p class="text-[10px] font-tech text-slate-500">
+                    > <%= toWIB(log.created_at) %>
+                    <% if (log.ip_address) { %>
+                      <span class="text-eva-orange/70"> • IP: <%= log.ip_address %></span>
+                    <% } %>
+                  </p>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="text-center py-8">
+              <i data-lucide="shield-check" class="w-8 h-8 text-eva-green/30 mx-auto mb-2"></i>
+              <p class="text-[10px] font-tech text-eva-green/60 tracking-widest">> TIDAK ADA AKTIVITAS MENCURIGAKAN</p>
+            </div>
+          <% } %>
+        </div>
+        
+        <!-- Footer untuk navigasi ke halaman diagnostik nanti (A02) -->
+        <div class="p-3 border-t border-eva-orange/30 bg-eva-orange/5 text-center">
+          <button class="text-[10px] font-tech font-bold text-eva-orange hover:text-white tracking-[0.15em] flex items-center justify-center gap-2 w-full transition-colors clip-mecha border border-eva-orange/30 hover:bg-eva-orange/20 py-2">
+            <i data-lucide="settings-2" class="w-3 h-3"></i> LIHAT DIAGNOSTIK KEAMANAN LENGKAP
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      
+      // Subtle random glitch effect to title for extra EVA vibe
+      const title = document.querySelector('h1');
+      if(title) {
+        setInterval(() => {
+          if(Math.random() > 0.95) {
+            title.style.textShadow = '2px 0 #4ade80, -2px 0 #8b5cf6';
+            setTimeout(() => { title.style.textShadow = '0 0 8px rgba(139, 92, 246, 0.6)'; }, 100);
+          }
+        }, 2000);
+      }
+    });
+  </script>
+</body>
+</html>

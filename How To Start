@@ -1,0 +1,5 @@
+docker-compose down -v
+docker-compose build --no-cache app
+docker-compose up -d
+sleep 10
+docker-compose logs db --tail=30
