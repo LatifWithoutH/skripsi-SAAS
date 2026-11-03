@@ -5,11 +5,11 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ 1. TAMBAHKAN 'tenant_id' di SELECT query
+    // ✅ 1. HAPUS 'tenant_id' dari SELECT (karena tidak ada di tabel mitra_accounts)
     const query = `
-      SELECT id, tenant_id, mitra_id, name, email, password_hash, status
+      SELECT id, mitra_id, name, email, password_hash, status, last_login
       FROM mitra_accounts
-      WHERE email = $1
+      WHERE LOWER(email) = LOWER($1)
     `;
     const result = await pool.query(query, [email]);
 
@@ -29,13 +29,36 @@ exports.login = async (req, res) => {
       return res.redirect('/portal-mitra/login?error=invalid_credentials');
     }
 
-    // ✅ 2. SIMPAN 'tenantId' KE SESSION (INI KUNCINYA)
+    // ✅ 2. AMBIL SCOPE TENANT DARI TABEL JUNCTION (tenant_mitras)
+    const scopeQuery = `
+      SELECT DISTINCT tm.tenant_id, t.name AS tenant_name, t.slug
+      FROM tenant_mitras tm
+      JOIN tenants t ON t.id = tm.tenant_id
+      WHERE tm.mitra_id = $1
+        AND t.status = 'active'
+      ORDER BY t.name ASC
+    `;
+    const scopeResult = await pool.query(scopeQuery, [mitraAccount.mitra_id]);
+    const allowedTenants = scopeResult.rows;
+
+    // 🚨 VALIDASI: Jika akun ada tapi tidak di-claim oleh kampus mana pun, tolak akses
+    if (allowedTenants.length === 0) {
+      return res.redirect('/portal-mitra/login?error=no_active_relationship');
+    }
+
+    // ✅ 3. SIMPAN KE SESSION DENGAN BENAR (Model M:N)
     req.session.mitraAccountId = mitraAccount.id;
-    req.session.tenantId = mitraAccount.tenant_id; // ← TAMBAHKAN BARIS INI
     req.session.mitraId = mitraAccount.mitra_id;
     req.session.mitraName = mitraAccount.name;
+    req.session.isMitra = true; 
+    
+    req.session.allowedTenants = allowedTenants.map(t => t.tenant_id); 
+    req.session.activeTenantId = allowedTenants.length === 1 
+      ? allowedTenants[0].tenant_id 
+      : allowedTenants[0].tenant_id; 
 
-    // 🎯 FIRST LOGIN ACTIVATION: Jika status pending_invite, redirect ke halaman ganti password
+    await pool.query(`UPDATE mitra_accounts SET last_login = CURRENT_TIMESTAMP WHERE id = $1`, [mitraAccount.id]);
+
     if (mitraAccount.status === 'pending_invite') {
       return res.redirect('/portal-mitra/first-login');
     }
@@ -47,6 +70,8 @@ exports.login = async (req, res) => {
   }
 };
 
+// ... (pastikan fungsi exports.logout, firstLogin, dan changePassword juga ada di bawahnya)
+
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error('Error destroying session:', err);
@@ -54,10 +79,10 @@ exports.logout = (req, res) => {
   });
 };
 
-// 🆕 BARU: Handle first login password change
+// 🆕 Handle first login password change
 exports.firstLogin = async (req, res) => {
-  // Pastikan user sudah login (punya session mitra)
-  if (!req.session.mitraAccountId) {
+  // Pastikan user sudah login sebagai mitra
+  if (!req.session.isMitra || !req.session.mitraAccountId) {
     return res.redirect('/portal-mitra/login');
   }
 
@@ -100,7 +125,7 @@ exports.changePassword = async (req, res) => {
       return res.redirect('/portal-mitra/first-login?error=update_failed');
     }
 
-    // Audit log
+    // Audit log (tenant_id NULL karena ini aksi global level akun, bukan level kampus spesifik)
     await client.query(
       `INSERT INTO audit_logs (tenant_id, user_id, action, target_table, target_id, details, ip_address)
        VALUES (NULL, NULL, 'MITRA_FIRST_LOGIN_ACTIVATION', 'mitra_accounts', $1, $2, $3)`,
@@ -109,7 +134,6 @@ exports.changePassword = async (req, res) => {
 
     await client.query('COMMIT');
 
-    // Redirect ke dashboard
     return res.redirect('/portal-mitra/dashboard');
   } catch (err) {
     await client.query('ROLLBACK');

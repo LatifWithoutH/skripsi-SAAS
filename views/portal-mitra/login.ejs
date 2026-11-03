@@ -1,46 +1,152 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Portal Mitra | SI-MITRA-DUDIKA</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(15px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .transition-smooth { transition: all 0.2s ease-in-out; }
+  </style>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
-  <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl border border-slate-200">
-    <div class="text-center mb-8">
-      <div class="bg-indigo-100 text-indigo-600 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
-        <i data-lucide="building-2" class="w-7 h-7"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-slate-900">Portal Mitra Industri</h2>
-      <p class="text-slate-500 text-sm mt-1">Masuk untuk mengelola dokumen kerjasama Anda</p>
-    </div>
-
-    <% if (locals.error) { %>
-      <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-        <i data-lucide="alert-circle" class="w-4 h-4"></i>
-        <% if (error === 'invalid_credentials') { %> Email atau password salah.
-        <% } else if (error === 'account_suspended') { %> Akun Anda sedang ditangguhkan.
-        <% } else { %> Terjadi kesalahan sistem.
-        <% } %>
-      </div>
-    <% } %>
-
-    <form action="/portal-mitra/login" method="POST" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Email Perusahaan</label>
-        <input type="email" name="email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="pic@perusahaan.com">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-        <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="••••••••">
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
-        Masuk ke Portal
-      </button>
-    </form>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-sans text-slate-900">
+  
+  <!-- Decorative Background Blobs (Memberi kesan premium) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
   </div>
-  <script>lucide.createIcons();</script>
+
+  <div class="w-full max-w-md animate-fade-in-up">
+    <!-- Login Card -->
+    <div class="bg-white/90 backdrop-blur-sm w-full p-8 md:p-10 rounded-2xl shadow-xl border border-slate-200/60">
+      
+      <!-- Header Card (Lebih Clean & Fokus) -->
+      <div class="text-center mb-8">
+        <div class="bg-indigo-50 text-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-indigo-100">
+          <i data-lucide="building-2" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Portal Mitra</h2>
+        <p class="text-slate-500 text-sm mt-2 leading-relaxed">Masuk untuk mengelola dokumen kerjasama dan memantau status MoU/MoA perusahaan Anda.</p>
+      </div>
+
+      <!-- Error Handling -->
+      <% if (locals.error) { %>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm animate-fade-in-up">
+          <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500"></i>
+          <div>
+            <p class="font-semibold mb-0.5">Gagal Masuk</p>
+            <% if (error === 'invalid_credentials') { %> 
+              <p>Email atau password yang Anda masukkan tidak valid.</p>
+            <% } else if (error === 'account_suspended') { %> 
+              <p>Akun perusahaan Anda sedang ditangguhkan. Silakan hubungi admin kampus.</p>
+            <% } else { %> 
+              <p>Terjadi kesalahan pada sistem. Silakan coba lagi.</p>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Form -->
+      <form action="/portal-mitra/login" method="POST" class="space-y-5">
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Perusahaan</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="email" 
+              name="email" 
+              required 
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth text-sm" 
+              placeholder="pic@perusahaan.com"
+            >
+          </div>
+        </div>
+
+        <!-- Password Input with Toggle -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="password" 
+              name="password" 
+              id="password"
+              required 
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth text-sm" 
+              placeholder="••••••••"
+            >
+            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1" aria-label="Toggle password visibility">
+              <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+              <i data-lucide="eye-off" id="eyeOffIcon" class="w-4 h-4 hidden"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition-smooth shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm mt-2">
+          <span>Masuk ke Portal</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <!-- Footer Info (Lebih Profesional) -->
+      <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+        <p class="text-xs text-slate-500 flex items-center justify-center gap-1.5">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          Koneksi Anda diamankan dengan enkripsi standar industri.
+        </p>
+        <!-- Jika mereka benar-benar tersesat, link ke publik ada di bawah dengan gaya yang sangat subtle -->
+        <p class="text-xs text-slate-400 mt-3">
+          Bukan mitra? <a href="/" class="text-slate-500 hover:text-indigo-600 transition-smooth underline decoration-slate-300 underline-offset-2">Kunjungi halaman publik</a>
+        </p>
+      </div>
+    </div>
+    
+    <p class="text-center text-xs text-slate-400 mt-8">
+      &copy; 2026 SI-MITRA-DUDIKA. Portal Kemitraan Terpadu.
+    </p>
+  </div>
+
+  <script>
+    // Toggle Password Visibility Logic
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const eyeOffIcon = document.getElementById('eyeOffIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.add('hidden');
+        eyeOffIcon.classList.remove('hidden');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('hidden');
+        eyeOffIcon.classList.add('hidden');
+      }
+    }
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
 </body>
 </html>

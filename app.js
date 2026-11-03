@@ -1,21 +1,15 @@
 require('dotenv').config();
 const morgan = require('morgan');
-const helmet = require('helmet'); // ✅ TAMBAHAN: Security Headers
+const helmet = require('helmet');
 
-const { testConnection, pool } = require('./config/database');
+const { testConnection } = require('./config/database'); 
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const rateLimit = require('express-rate-limit');
-
-
-
-console.log('🔍 [VERBOSE] Memulai inisialisasi aplikasi...');
 
 // ==========================================
 // 1. IMPORT CONTROLLERS
 // ==========================================
-console.log('📂 [VERBOSE] Memuat Controllers...');
 const registerController = require('./controllers/registerController');
 const authController = require('./controllers/authController');
 const dashboardController = require('./controllers/dashboardController');
@@ -27,33 +21,26 @@ const partnerAuthController = require('./controllers/partnerAuthController');
 const uploadController = require('./controllers/uploadController');
 const platformAuthController = require('./controllers/platformAuthController');
 const platformController = require('./controllers/platformController');
-console.log('✅ [VERBOSE] Semua Controllers berhasil dimuat.');
+const partnerController = require('./controllers/partnerController'); // ✅ Logika SQL sudah dipindah ke sini
 
 // ==========================================
 // 2. IMPORT MIDDLEWARE
 // ==========================================
-console.log('🛡️ [VERBOSE] Memuat Middlewares...');
 const { ensureAuthenticated } = require('./middleware/tenantAuth');
 const upload = require('./middleware/upload');
 const { ensurePlatformAdmin } = require('./middleware/platformAuth');
-console.log('✅ [VERBOSE] Semua Middlewares berhasil dimuat.');
+const { checkMitraDomain, ensurePartnerAuthenticated } = require('./middleware/partnerMiddleware');
+const { authLimiter, registerLimiter } = require('./middleware/rateLimiter'); // ✅ BARU: Rate limiter dipisah
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
 const timeHelper = require('./utils/timeHelper');
 
 // ==========================================
 // ✅ PERBAIKAN KEAMANAN (A02 & A09)
 // ==========================================
-// 1. Trust Proxy: Wajib agar req.ip membaca IP asli (bukan IP internal Docker/Nginx)
 app.set('trust proxy', 1);
-
-// 2. Hide X-Powered-By: Mencegah kebocoran info stack teknologi
 app.disable('x-powered-by');
-
-// 3. Helmet: Menambahkan header keamanan standar (CSP dimatikan sementara agar tidak bentrok dengan inline script EJS)
 app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
@@ -68,6 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] bytes'));
 
+// Logging session hanya untuk development
 app.use((req, res, next) => {
     if (process.env.NODE_ENV !== 'production') {
         const sessionInfo = req.session ? {
@@ -77,7 +65,6 @@ app.use((req, res, next) => {
             tenantId: req.session.tenantId || 'None',
             mitraId: req.session.mitraId || 'None'
         } : 'No Session';
-        
         console.log(`👤 [VERBOSE SESSION] ${req.method} ${req.url} | User:`, sessionInfo);
     }
     next();
@@ -95,7 +82,6 @@ app.use(session({
     }
 }));
 
-// Tambahkan sebelum app.set('view engine', 'ejs');
 app.locals.toWIB = timeHelper.toWIB;
 app.locals.timeAgo = timeHelper.timeAgo;
 
@@ -104,47 +90,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', false); 
 
 // ==========================================
-// 4. RATE LIMITING
+// 4. DOMAIN ISOLATION
 // ==========================================
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: 'Terlalu banyak percobaan login. Silakan coba lagi dalam 15 menit.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const registerLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 3,
-  message: { error: 'Terlalu banyak percobaan registrasi. Silakan coba lagi dalam 15 menit.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+app.use(checkMitraDomain);
 
 // ==========================================
-// 5. DOMAIN ISOLATION & AUTH MIDDLEWARE
-// ==========================================
-app.use((req, res, next) => {
-    const host = req.headers.host;
-    
-    // Portal mitra HANYA aktif di domain mitra.saas.local atau mitra.saas.com
-    // localhost:3000 adalah default untuk tenant/kampus
-    req.isMitraPortal = (host === 'mitra.saas.local' || host === 'mitra.saas.com');
-    
-    next();
-});
-
-const ensurePartnerAuthenticated = (req, res, next) => {
-    if (!req.session.mitraAccountId) {
-        console.log(' [VERBOSE AUTH] Akses portal mitra ditolak: Tidak ada session mitraAccountId');
-        return res.redirect('/portal-mitra/login');
-    }
-    next();
-};
-
-// ==========================================
-// 6. ROUTING PUBLIK & KAMPUS (TENANT)
+// 5. ROUTING PUBLIK & KAMPUS (TENANT)
 // ==========================================
 app.get('/', (req, res) => {
     if (req.isMitraPortal) return res.redirect('/portal-mitra/login');
@@ -174,7 +125,7 @@ app.get('/kerjasama', ensureAuthenticated, kerjasamaController.getKerjasamaPage)
 app.post('/kerjasama', ensureAuthenticated, kerjasamaController.createKerjasama);
 
 // ==========================================
-// 7. ROUTING PORTAL PLATFORM (SUPERADMIN)
+// 6. ROUTING PORTAL PLATFORM (SUPERADMIN)
 // ==========================================
 app.get('/platform/login', platformAuthController.showLogin);
 app.post('/platform/login', authLimiter, platformAuthController.handleLogin);
@@ -185,7 +136,7 @@ app.post('/platform/tenants/:tenantId/approve', ensurePlatformAdmin, platformCon
 app.post('/platform/tenants/:tenantId/reject', ensurePlatformAdmin, platformController.rejectTenant);
 
 // ==========================================
-// 8. ROUTING PORTAL MITRA
+// 7. ROUTING PORTAL MITRA
 // ==========================================
 app.get('/portal-mitra/first-login', partnerAuthController.firstLogin);
 app.post('/portal-mitra/change-password', partnerAuthController.changePassword);
@@ -198,75 +149,35 @@ app.get('/portal-mitra/login', (req, res) => {
 app.post('/portal-mitra/login', authLimiter, partnerAuthController.login);
 app.post('/portal-mitra/logout', partnerAuthController.logout);
 
-app.get('/portal-mitra/dashboard', ensurePartnerAuthenticated, async (req, res) => {
-    try {
-        const mitraId = req.session.mitraId;
-        
-        const query = `
-            SELECT 
-                k.judul, k.jenis, k.tanggal_mulai, k.tanggal_berakhir, k.status,
-                t.name as tenant_name,
-                CASE WHEN k.tanggal_berakhir < CURRENT_DATE THEN 'expired' ELSE k.status END as current_status 
-            FROM kerjasama k
-            JOIN tenants t ON t.id = k.tenant_id
-            WHERE k.mitra_id = $1 
-            ORDER BY k.tanggal_berakhir DESC
-        `;
-        const result = await pool.query(query, [mitraId]);
-        
-        const statsQuery = `
-            SELECT COUNT(*) as "activeCount" 
-            FROM kerjasama 
-            WHERE mitra_id = $1 AND tanggal_berakhir >= CURRENT_DATE AND status = 'active'
-        `;
-        const statsResult = await pool.query(statsQuery, [mitraId]);
-
-        res.render('portal-mitra/dashboard', {
-            mitraName: req.session.mitraName || 'Mitra',
-            kerjasamaList: result.rows,
-            stats: statsResult.rows[0]
-        });
-    } catch (err) {
-        console.error('❌ [PARTNER DASHBOARD] Error:', err);
-        res.status(500).send('Terjadi kesalahan pada portal mitra.');
-    }
-});
-
+// ✅ BERSIH: Routing sekarang hanya 1 baris, logika SQL ada di partnerController
+app.get('/portal-mitra/dashboard', ensurePartnerAuthenticated, partnerController.getDashboard);
 app.post('/portal-mitra/upload-dokumen', ensurePartnerAuthenticated, upload.single('dokumen'), uploadController.uploadDokumen);
 
 // ==========================================
-// 9. HANDLER 404 GLOBAL
+// 8. HANDLER 404 GLOBAL
 // ==========================================
 app.use((req, res) => {
-    console.log(`⚠️ [VERBOSE 404] Route tidak ditemukan: ${req.method} ${req.url}`);
-    res.status(404).send(`
-        <div class="flex items-center justify-center min-h-screen bg-gray-50 font-sans">
-            <div class="text-center">
-                <h1 class="text-6xl font-bold text-gray-800 mb-4">404</h1>
-                <p class="text-xl text-gray-600 mb-6">Halaman tidak ditemukan.</p>
-                <a href="/" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Kembali ke Beranda</a>
-            </div>
-        </div>
-    `);
+    console.log(`⚠️ [404] Route tidak ditemukan: ${req.method} ${req.url}`);
+    // ✅ Render file EJS, bukan HTML inline
+    res.status(404).render('errors/404'); 
 });
 
 // ==========================================
-// 10. MENJALANKAN SERVER
+// 9. MENJALANKAN SERVER
 // ==========================================
 testConnection().then(() => {
     app.listen(PORT, () => {
         console.log('=======================================================');
-        console.log('🚀 [VERBOSE] Server SIMITRADUDIKA berhasil dijalankan!');
+        console.log('🚀 Server SIMITRADUDIKA berhasil dijalankan!');
         console.log(`🌍 Environment : ${process.env.NODE_ENV || 'development'}`);
         console.log(`🔗 Akses Kampus   : http://localhost:${PORT}`);
         console.log(`🔗 Akses Platform : http://localhost:${PORT}/platform/login`);
         console.log(`🔗 Akses Mitra    : http://localhost:${PORT}/portal-mitra/login`);
-        console.log(`🛡️ Rate Limiting  : ACTIVE`);
-        console.log(`📝 Logging Mode   : VERBOSE (Morgan + Custom)`);
+        console.log(`🛡️ Rate Limiting  : ACTIVE (via middleware/rateLimiter.js)`);
         console.log('=======================================================');
     });
 }).catch(err => {
-    console.error('💥 [VERBOSE] Gagal memulai server karena masalah database.');
+    console.error('💥 Gagal memulai server karena masalah database.');
     console.error(err);
 });
 

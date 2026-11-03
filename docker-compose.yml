@@ -9,8 +9,10 @@ services:
       POSTGRES_USER: skripsi_user
       POSTGRES_PASSWORD: rahasia_kuat_123
       POSTGRES_DB: saas_skripsi_db
+      TZ: Asia/Jakarta
     volumes:
       - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data  # ✅ Persisten data database
     networks:
       - internal_network
     # ✅ TAMBAHAN PENTING: Healthcheck agar Node.js menunggu DB benar-benar siap
@@ -19,6 +21,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
 
   # 2. Lapisan Aplikasi (Node.js)
   app:
@@ -35,6 +38,19 @@ services:
         condition: service_healthy
     networks:
       - internal_network
+    # ✅ BIND MOUNT: Sync folder host → container (untuk development)
+    volumes:
+      - .:/app                    # Sync seluruh folder proyek ke container
+      - /app/node_modules         # Kecuali node_modules (pakai yang di container)
+      - /app/public/uploads       # Kecuali uploads (biar persisten)
+    # ✅ Healthcheck untuk monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
 
   # 3. Lapisan Jaringan / Reverse Proxy (Nginx)
   proxy:
@@ -48,8 +64,13 @@ services:
       - app
     networks:
       - internal_network
+    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
 
-# Definisi Jaringan Virtual Terisolasi
+# ✅ Definisi Jaringan Virtual Terisolasi
 networks:
   internal_network:
     driver: bridge
+
+# ✅ Definisi Volume Persisten
+volumes:
+  postgres_data:  # ✅ Data database tidak hilang saat container di-recreate

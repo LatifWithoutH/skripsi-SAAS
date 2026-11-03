@@ -1,40 +1,173 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masuk | SaaS Skripsi</title>
+  <title>Masuk | SIMITRADUDIKA</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
-  <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl border border-gray-100">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+  
+  <!-- Decorative Background Elements (Subtle Blobs) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/2 -right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="w-full max-w-md animate-fade-in-up">
+    <!-- Logo / Brand Link -->
     <div class="text-center mb-8">
-      <div class="bg-indigo-100 text-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
-        <i data-lucide="log-in" class="w-6 h-6"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-900">Selamat Datang Kembali</h2>
-      <p class="text-gray-500 text-sm mt-1">Masukkan kredensial Anda untuk mengakses dashboard</p>
+      <a href="/" class="inline-flex items-center gap-2 text-slate-900 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
+        <div class="bg-primary-600 text-white p-2 rounded-lg shadow-lg shadow-primary-500/30">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+        SIMITRA<span class="text-primary-600">DUDIKA</span>
+      </a>
     </div>
 
-    <form action="/login" method="POST" class="space-y-5">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-        <input type="email" name="email" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="nama@kampus.ac.id">
+    <!-- Login Card -->
+    <div class="glass-card w-full p-8 rounded-2xl shadow-xl border border-slate-200/60">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-slate-900">Selamat Datang Kembali</h2>
+        <p class="text-slate-500 text-sm mt-2">Masukkan kredensial Anda untuk mengakses dashboard institusi.</p>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="••••••••">
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
-        Masuk ke Sistem
-      </button>
-    </form>
 
-    <p class="text-center text-sm text-gray-600 mt-6">
-      Belum punya akun? <a href="/register" class="text-indigo-600 font-semibold hover:underline">Daftar di sini</a>
+      <!-- Error Message Handling (Sesuai logika di authController.js) -->
+      <% if (locals.error) { %>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 text-sm animate-fade-in-up">
+          <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-semibold mb-1">Login Gagal</p>
+            <% if (error === 'Email atau password salah.') { %>
+              <p>Email atau password yang Anda masukkan tidak valid.</p>
+            <% } else if (error.includes('pending_approval') || error.includes('review')) { %>
+              <p>Akun institusi Anda masih dalam proses verifikasi oleh admin platform.</p>
+            <% } else if (error.includes('suspended') || error.includes('ditangguhkan')) { %>
+              <p>Akun institusi Anda telah ditangguhkan. Silakan hubungi admin platform.</p>
+            <% } else if (error.includes('ditolak')) { %>
+              <p>Pendaftaran institusi Anda telah ditolak.</p>
+            <% } else { %>
+              <p><%= error %></p>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" class="space-y-5">
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Institusi</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="email" 
+              name="email" 
+              value="<%= typeof oldInput !== 'undefined' && oldInput.email ? oldInput.email : '' %>"
+              required 
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm" 
+              placeholder="nama@kampus.ac.id"
+            >
+          </div>
+        </div>
+
+        <!-- Password Input with Toggle -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="password" 
+              name="password" 
+              id="password"
+              required 
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm" 
+              placeholder="••••••••"
+            >
+            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1" aria-label="Toggle password visibility">
+              <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+              <i data-lucide="eye-off" id="eyeOffIcon" class="w-4 h-4 hidden"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-primary-600 text-white font-semibold py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+          <span>Masuk ke Sistem</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <!-- Footer Links -->
+      <div class="mt-8 pt-6 border-t border-slate-100 text-center space-y-3">
+        <p class="text-sm text-slate-600">
+          Belum punya akun institusi? 
+          <a href="/register" class="text-primary-600 font-semibold hover:text-primary-700 hover:underline transition-colors">Daftar di sini</a>
+        </p>
+        <p class="text-xs text-slate-400">
+          Atau login sebagai <a href="/portal-mitra/login" class="text-slate-500 hover:text-primary-600 underline decoration-slate-300 underline-offset-2 transition-colors">Mitra Industri</a>
+        </p>
+      </div>
+    </div>
+    
+    <p class="text-center text-xs text-slate-400 mt-8">
+      &copy; 2026 SIMITRADUDIKA. Platform SaaS Multi-Tenant.
     </p>
   </div>
-  <script>lucide.createIcons();</script>
+
+  <script>
+    // Toggle Password Visibility Logic
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const eyeOffIcon = document.getElementById('eyeOffIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.add('hidden');
+        eyeOffIcon.classList.remove('hidden');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('hidden');
+        eyeOffIcon.classList.add('hidden');
+      }
+    }
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
 </body>
 </html>
