@@ -1,115 +1,165 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dokumen Kerjasama | SaaS Skripsi</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>Dokumen Kerjasama | SIMITRADUDIKA</title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi -->
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans">
-  <div class="flex">
-    <%- include('../partials/_sidebar', { isTenant: true }) %>
-    <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
-      <%- include('../partials/_header', { user: user }) %>
 
-      <main class="flex-1 p-6 md:p-8">
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-700">
+  <div class="flex min-h-screen">
+    
+    <!-- 1. SIDEBAR PARTIAL -->
+    <%- include('../partials/_sidebar', { isTenant: true }) %>
+    
+    <!-- 2. MAIN CONTENT AREA -->
+    <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
+      
+      <!-- HEADER PARTIAL -->
+      <%- include('../partials/_header', { 
+        user: typeof user !== 'undefined' ? user : { name: 'Admin', role: 'super_admin' },
+        tenantName: typeof tenantName !== 'undefined' ? tenantName : 'SIMITRADUDIKA',
+        pageTitle: 'Dokumen Kerjasama'
+      }) %>
+
+      <main class="flex-1 p-4 md:p-8 space-y-6">
+        
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Dokumen Kerjasama</h1>
-            <p class="text-gray-500">Kelola MoU, MoA, dan IA dengan mitra industri.</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dokumen Kerjasama</h1>
+            <p class="text-slate-500 text-sm mt-1">Kelola MoU, MoA, dan IA dengan mitra industri secara terpusat.</p>
           </div>
-          <button onclick="toggleModal()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium">
-            <i data-lucide="file-plus" class="w-4 h-4"></i> Tambah Kerjasama
-          </button>
+          
+          <!-- Tombol Tambah (Hanya muncul jika punya izin 'write:kerjasama') -->
+          <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:kerjasama')) { %>
+            <button onclick="toggleModal()" class="inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm">
+              <i data-lucide="file-plus" class="w-4 h-4"></i> Tambah Kerjasama
+            </button>
+          <% } %>
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="file-check" class="w-6 h-6"></i></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4 hover:shadow-md hover:border-emerald-200 transition-all duration-300 group">
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
+              <i data-lucide="file-check" class="w-6 h-6"></i>
+            </div>
             <div>
-              <p class="text-sm text-gray-500 font-medium">Kerjasama Aktif</p>
-              <p class="text-2xl font-bold text-gray-900"><%= stats.active_count %></p>
+              <p class="text-sm text-slate-500 font-medium">Kerjasama Aktif</p>
+              <p class="text-2xl font-bold text-slate-900"><%= typeof stats !== 'undefined' ? stats.active_count : '0' %></p>
             </div>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="p-3 bg-red-50 text-red-600 rounded-lg"><i data-lucide="file-x" class="w-6 h-6"></i></div>
+          
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4 hover:shadow-md hover:border-red-200 transition-all duration-300 group">
+            <div class="p-3 bg-red-50 text-red-600 rounded-xl group-hover:scale-110 transition-transform">
+              <i data-lucide="file-x" class="w-6 h-6"></i>
+            </div>
             <div>
-              <p class="text-sm text-gray-500 font-medium">Kadaluarsa (Expired)</p>
-              <p class="text-2xl font-bold text-gray-900"><%= stats.expired_count %></p>
+              <p class="text-sm text-slate-500 font-medium">Kadaluarsa (Expired)</p>
+              <p class="text-2xl font-bold text-slate-900"><%= typeof stats !== 'undefined' ? stats.expired_count : '0' %></p>
             </div>
           </div>
         </div>
 
-        <!-- Notifikasi -->
-        <% if (locals.success) { %>
-          <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Dokumen kerjasama berhasil ditambahkan!
+        <!-- Notifikasi Sukses -->
+        <% if (typeof locals !== 'undefined' && locals.success) { %>
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+            <i data-lucide="check-circle-2" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-semibold text-sm">Berhasil!</p>
+              <p class="text-xs text-emerald-600 mt-0.5">Dokumen kerjasama berhasil ditambahkan ke dalam sistem.</p>
+            </div>
           </div>
         <% } %>
 
         <!-- Tabel Data -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <% if (kerjasamaList && kerjasamaList.length > 0) { %>
-            <table class="w-full text-sm text-left">
-              <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100 uppercase text-xs tracking-wider">
-                <tr>
-                  <th class="px-6 py-4">Judul Kerjasama</th>
-                  <th class="px-6 py-4">Mitra</th>
-                  <th class="px-6 py-4">Jenis</th>
-                  <th class="px-6 py-4">Periode</th>
-                  <th class="px-6 py-4">Status</th>
-                  <th class="px-6 py-4 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <% kerjasamaList.forEach(function(k) { %>
-                  <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 font-medium text-gray-900"><%= k.judul %></td>
-                    <td class="px-6 py-4 text-gray-600"><%= k.mitra_name || 'Umum' %></td>
-                    <td class="px-6 py-4">
-                      <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold border border-indigo-100">
-                        <%= k.jenis %>
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-gray-600 text-xs">
-                      <%= new Date(k.tanggal_mulai).toLocaleDateString('id-ID') %> s/d <br>
-                      <%= new Date(k.tanggal_berakhir).toLocaleDateString('id-ID') %>
-                    </td>
-                    <td class="px-6 py-4">
-                      <% if (k.current_status === 'active') { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
-                        </span>
-                      <% } else if (k.current_status === 'expired') { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                          <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Expired
-                        </span>
-                      <% } else { %>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                          <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span> Draft
-                        </span>
-                      <% } %>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                      <button class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                        <i data-lucide="eye" class="w-4 h-4"></i>
-                      </button>
-                    </td>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+          <% if (typeof kerjasamaList !== 'undefined' && kerjasamaList && kerjasamaList.length > 0) { %>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-xs tracking-wider">
+                  <tr>
+                    <th class="px-6 py-4">Judul Kerjasama</th>
+                    <th class="px-6 py-4">Mitra</th>
+                    <th class="px-6 py-4">Jenis</th>
+                    <th class="px-6 py-4">Periode</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-right">Aksi</th>
                   </tr>
-                <% }); %>
-              </tbody>
-            </table>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <% kerjasamaList.forEach(function(k) { 
+                    let statusClass = 'bg-slate-100 text-slate-700';
+                    let statusDot = 'bg-slate-500';
+                    let statusText = 'Draft';
+                    
+                    if (k.current_status === 'active') {
+                      statusClass = 'bg-emerald-50 text-emerald-700 border border-emerald-100';
+                      statusDot = 'bg-emerald-500';
+                      statusText = 'Aktif';
+                    } else if (k.current_status === 'expired') {
+                      statusClass = 'bg-red-50 text-red-700 border border-red-100';
+                      statusDot = 'bg-red-500';
+                      statusText = 'Expired';
+                    }
+                  %>
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="px-6 py-4 font-medium text-slate-900"><%= k.judul %></td>
+                      <td class="px-6 py-4 text-slate-600"><%= k.mitra_name || 'Umum' %></td>
+                      <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-1 bg-primary-50 text-primary-700 border border-primary-100 rounded-full text-xs font-semibold">
+                          <%= k.jenis %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-slate-600 text-xs whitespace-nowrap">
+                        <%= new Date(k.tanggal_mulai).toLocaleDateString('id-ID') %> s/d <br>
+                        <span class="text-slate-400"><%= new Date(k.tanggal_berakhir).toLocaleDateString('id-ID') %></span>
+                      </td>
+                      <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold <%= statusClass %>">
+                          <span class="w-1.5 h-1.5 rounded-full <%= statusDot %>"></span> <%= statusText %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 text-right">
+                        <button class="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all" title="Lihat Detail">
+                          <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
           <% } else { %>
+            <!-- Empty State -->
             <div class="p-12 text-center">
-              <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="file-text" class="w-8 h-8 text-gray-400"></i>
+              <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="file-text" class="w-8 h-8 text-slate-400"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Belum ada dokumen kerjasama</h3>
-              <p class="text-gray-500 mt-1 mb-4">Mulai tambahkan MoU atau MoA dengan mitra Anda.</p>
-              <button onclick="toggleModal()" class="text-indigo-600 font-semibold hover:underline">Tambah Dokumen Pertama</button>
+              <h3 class="text-lg font-semibold text-slate-900">Belum ada dokumen kerjasama</h3>
+              <p class="text-slate-500 text-sm mt-1 mb-6 max-w-sm mx-auto">Mulai tambahkan MoU, MoA, atau IA dengan mitra industri Anda untuk memulai kolaborasi.</p>
+              
+              <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:kerjasama')) { %>
+                <button onclick="toggleModal()" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700 hover:underline transition-colors">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Dokumen Pertama
+                </button>
+              <% } %>
             </div>
           <% } %>
         </div>
@@ -117,101 +167,140 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH KERJASAMA -->
-  <div id="kerjasamaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900">Tambah Dokumen Kerjasama</h3>
-        <button onclick="toggleModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full">
+  <!-- MODAL: Tambah Dokumen Kerjasama (Hanya di-render jika punya izin) -->
+  <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:kerjasama')) { %>
+  <div id="kerjasamaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 transition-opacity duration-300">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all scale-100">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="file-plus" class="w-5 h-5 text-primary-600"></i> Tambah Dokumen Kerjasama
+        </h3>
+        <button onclick="toggleModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Tutup modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
       
-      <form action="/kerjasama" method="POST" class="p-6 space-y-4">
+      <!-- Modal Body (Form) -->
+      <form action="/kerjasama" method="POST" class="p-6 space-y-5">
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Kerjasama</label>
-          <input type="text" name="judul" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Contoh: MoU Magang Mahasiswa 2026">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Judul Kerjasama <span class="text-red-500">*</span></label>
+          <input type="text" name="judul" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="Contoh: MoU Magang Mahasiswa 2026">
         </div>
         
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Dokumen</label>
-            <select name="jenis" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
-              <option value="MoU">MoU (Memorandum of Understanding)</option>
-              <option value="MoA">MoA (Memorandum of Agreement)</option>
-              <option value="IA">IA (Implementation Arrangement)</option>
-            </select>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jenis Dokumen <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <select name="jenis" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
+                <option value="MoU">MoU (Memorandum of Understanding)</option>
+                <option value="MoA">MoA (Memorandum of Agreement)</option>
+                <option value="IA">IA (Implementation Arrangement)</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            </div>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Mitra (Opsional)</label>
-            <select name="mitra_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
-              <option value="">Umum / Tidak Spesifik</option>
-              <% if (locals.mitras && mitras.length > 0) { %>
-                <% mitras.forEach(function(m) { %>
-                  <option value="<%= m.id %>"><%= m.name %></option>
-                <% }); %>
-              <% } %>
-            </select>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Mitra</label>
+            <div class="relative">
+              <select name="mitra_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
+                <option value="">Umum / Tidak Spesifik</option>
+                <% if (typeof locals !== 'undefined' && locals.mitras && locals.mitras.length > 0) { %>
+                  <% locals.mitras.forEach(function(m) { %>
+                    <option value="<%= m.id %>"><%= m.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            </div>
           </div>
         </div>
         
-        <!-- ✅ LOGIKA UNIT / FAKULTAS BERDASARKAN ROLE -->
-        <% if (user.role !== 'faculty_operator') { %>
+        <!-- LOGIKA UNIT / FAKULTAS BERDASARKAN ROLE -->
+        <% if (typeof user !== 'undefined' && user.role !== 'faculty_operator') { %>
           <!-- Jika Admin/Owner: Tampilkan Dropdown -->
-          <div class="col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Unit / Fakultas (Opsional)</label>
-            <select name="unit_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
-              <option value="">Tidak terikat (Akses Seluruh Unit)</option>
-              <% if (locals.units && units.length > 0) { %>
-                <% units.forEach(function(u) { %>
-                  <option value="<%= u.id %>"><%= u.name %> (<%= u.code %>)</option>
-                <% }); %>
-              <% } %>
-            </select>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Unit / Fakultas</label>
+            <div class="relative">
+              <select name="unit_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
+                <option value="">Tidak terikat (Akses Seluruh Unit)</option>
+                <% if (typeof locals !== 'undefined' && locals.units && locals.units.length > 0) { %>
+                  <% locals.units.forEach(function(u) { %>
+                    <option value="<%= u.id %>"><%= u.name %> (<%= u.code %>)</option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            </div>
           </div>
         <% } else { %>
           <!-- Jika Faculty Operator: Sembunyikan dropdown, pakai hidden input + info box -->
-          <input type="hidden" name="unit_id" value="<%= user.unitId %>">
-          <div class="col-span-2 bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 items-start">
-            <i data-lucide="info" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+          <input type="hidden" name="unit_id" value="<%= typeof user !== 'undefined' && user.unitId ? user.unitId : '' %>">
+          <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 flex gap-3 items-start">
+            <i data-lucide="info" class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5"></i>
             <div>
-              <p class="text-sm font-medium text-blue-900">Terikat pada Unit Anda</p>
-              <p class="text-xs text-blue-700 mt-0.5">
-                Dokumen ini akan otomatis tercatat atas nama <strong><%= user.unitName || 'Fakultas Anda' %></strong>. 
-                Anda tidak dapat mengubah unit tujuan.
+              <p class="text-sm font-semibold text-primary-900">Terikat pada Unit Anda</p>
+              <p class="text-xs text-primary-700 mt-1 leading-relaxed">
+                Dokumen ini akan otomatis tercatat atas nama <strong><%= typeof user !== 'undefined' && user.unitName ? user.unitName : 'Fakultas Anda' %></strong>. Anda tidak dapat mengubah unit tujuan.
               </p>
             </div>
           </div>
         <% } %>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai</label>
-            <input type="date" name="tanggal_mulai" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Mulai <span class="text-red-500">*</span></label>
+            <input type="date" name="tanggal_mulai" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Berakhir</label>
-            <input type="date" name="tanggal_berakhir" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tanggal Berakhir <span class="text-red-500">*</span></label>
+            <input type="date" name="tanggal_berakhir" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm">
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-          <button type="button" onclick="toggleModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-          <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <button type="button" onclick="toggleModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">Batal</button>
+          <button type="submit" class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
             <i data-lucide="save" class="w-4 h-4"></i> Simpan Dokumen
           </button>
         </div>
       </form>
     </div>
   </div>
+  <% } %>
 
+  <!-- SCRIPTS -->
   <script>
+    // Modal Toggle Logic dengan Safe Check
     function toggleModal() {
       const modal = document.getElementById('kerjasamaModal');
-      modal.classList.toggle('hidden');
-      modal.classList.toggle('flex');
+      if (modal) {
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
     }
-    lucide.createIcons();
+    
+    // Close modal when clicking outside
+    document.getElementById('kerjasamaModal')?.addEventListener('click', function(e) {
+      if (e.target === this) {
+        toggleModal();
+      }
+    });
+
+    // Initialize Lucide Icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   </script>
+
+  <!-- Global Script -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

@@ -16,9 +16,12 @@ exports.registerTenant = async (req, res) => {
         const confirm_password = req.body.confirm_password;
         const subscription_plan = req.body.subscription_plan || 'starter';
         const agree_terms = req.body.agree_terms === 'on' || req.body.agree_terms === true;
+        
+        // ✅ BARU: Ambil slug dari input user dan sanitasi
+        const rawSlug = req.body.slug?.trim().toLowerCase();
 
         // 2. VALIDASI BACKEND (Wajib, karena frontend validation bisa di-bypass via Postman/cURL)
-        if (!tenant_name || !email || !password) {
+        if (!tenant_name || !email || !password || !rawSlug) {
             return res.redirect('/register?error=missing_fields');
         }
         if (password !== confirm_password) {
@@ -29,12 +32,21 @@ exports.registerTenant = async (req, res) => {
         }
 
         // ✅ PERBAIKAN KRITIS: Regex yang lebih fleksibel namun tetap aman.
-        // Sebelumnya: [A-Za-z\d@$!%*?&]{12,} (Menolak simbol lain seperti #, _, -)
-        // Sekarang: .{12,} (Menerima karakter apa saja, asalkan 4 syarat di bawah terpenuhi)
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{12,}$/;
-        
         if (!passwordRegex.test(password)) {
             return res.redirect('/register?error=weak_password');
+        }
+
+        // ✅ BARU: Validasi Format Slug (hanya huruf kecil, angka, strip, 3-30 karakter)
+        const slugRegex = /^[a-z0-9-]{3,30}$/;
+        if (!slugRegex.test(rawSlug)) {
+            return res.redirect('/register?error=invalid_slug');
+        }
+
+        // ✅ BARU: Cek Reserved Subdomains (Sama dengan di tenantResolver.js)
+        const RESERVED = ['mitra', 'platform', 'www', 'api', 'admin', 'localhost', 'mail', 'ftp', 'cdn', 'status', 'billing', 'help', 'docs'];
+        if (RESERVED.includes(rawSlug)) {
+            return res.redirect('/register?error=reserved_slug');
         }
 
         // 3. Mulai Transaksi Database (ACID Compliance)
@@ -60,9 +72,15 @@ exports.registerTenant = async (req, res) => {
             return res.redirect('/register?error=tenant_exists');
         }
 
-        // 6. Generate Slug Unik untuk Subdomain/URL Tenant (Contoh: universitasnusantara-8392)
-        const baseSlug = tenant_name.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 20);
-        const finalSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+        // ✅ BARU: Cek Slug Duplikat di Database (Defense in Depth)
+        const checkSlug = await client.query(`SELECT id FROM tenants WHERE slug = $1`, [rawSlug]);
+        if (checkSlug.rows.length > 0) {
+            await client.query('ROLLBACK');
+            return res.redirect('/register?error=slug_exists');
+        }
+
+        // Gunakan slug yang sudah divalidasi dari user
+        const finalSlug = rawSlug;
 
         // 7. Buat Record Tenant (Status: PENDING_APPROVAL untuk mencegah spam/abuse)
         const tenantQuery = `
@@ -93,7 +111,7 @@ exports.registerTenant = async (req, res) => {
             newTenantId, 
             newUserId, 
             newTenantId, 
-            JSON.stringify({ plan: subscription_plan, email }), 
+            JSON.stringify({ plan: subscription_plan, email, slug: finalSlug }), 
             req.ip || req.connection.remoteAddress, 
             userAgent
         ]);
@@ -101,13 +119,21 @@ exports.registerTenant = async (req, res) => {
         // 10. Commit Transaksi (Semua berhasil, simpan permanen)
         await client.query('COMMIT');
 
-        // 11. Redirect ke halaman sukses (Tanpa auto-login, menunggu approval admin platform)
-        res.redirect('/register?success=pending_approval');
+        // 11. ✅ PERBAIKAN: Redirect ke halaman sukses khusus dengan membawa parameter slug
+        return res.redirect(`/register-success?slug=${encodeURIComponent(finalSlug)}`);
 
     } catch (err) {
         // Rollback jika ada error di tengah proses (Mencegah data corrupt/orphaned records)
         await client.query('ROLLBACK');
         console.error('❌ [REGISTER TENANT] Critical Error:', err.message);
+        
+        // Handle unique constraint violation secara spesifik jika lolos validasi awal (race condition)
+        if (err.code === '23505') {
+            if (err.constraint === 'tenants_slug_key') {
+                return res.redirect('/register?error=slug_exists');
+            }
+            return res.redirect('/register?error=email_exists');
+        }
         
         // Redirect dengan error generic agar tidak membocorkan detail error database ke user
         res.redirect('/register?error=server');

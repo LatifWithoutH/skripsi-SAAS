@@ -10,7 +10,6 @@ exports.getMitraPage = async (req, res) => {
     try {
         const tenantId = req.session.tenantId;
         
-        // ✅ PERBAIKAN: Tambahkan LEFT JOIN ke mitra_accounts untuk mengambil status
         const query = `
             SELECT 
                 m.id, m.name, m.industry, m.website, m.verified,
@@ -30,7 +29,8 @@ exports.getMitraPage = async (req, res) => {
             mitras: result.rows,
             success: req.query.success,
             error: req.query.error,
-            warning: req.query.warning
+            warning: req.query.warning,
+            tenant: req.tenant || null // ✅ Diteruskan ke view jika perlu
         });
     } catch (err) {
         console.error('❌ [MITRA] Error mengambil data:', err);
@@ -135,10 +135,13 @@ exports.createMitra = async (req, res) => {
       const tempPass = req.session.tempInvitePassword;
       delete req.session.tempInvitePassword; 
       
+      // ✅ PERBAIKAN: Gunakan req.tenant.name agar nama universitas akurat dari middleware
+      const universityName = req.tenant ? req.tenant.name : 'Universitas Mitra';
+      
       const emailSent = await sendMitraInviteEmail(
         contact_email.trim().toLowerCase(), 
         name.trim(), 
-        req.session.tenantName || 'Universitas Mitra', 
+        universityName, 
         tempPass
       );
       

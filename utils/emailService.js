@@ -1,10 +1,14 @@
 const { Resend } = require('resend');
+const { getTenantUrl } = require('./urlHelper'); // ✅ 1. IMPORT HELPER BARU
 
-// Inisialisasi Resend dengan API Key dari .env
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendInviteEmail = async (email, tempPassword, unitName, roleName) => {
+// ✅ 2. TAMBAHKAN PARAMETER 'tenantSlug' di sini
+const sendInviteEmail = async (email, tempPassword, unitName, roleName, tenantSlug) => {
     try {
+        // ✅ 3. GENERATE URL DINAMIS (Contoh hasil: http://ums.saas.local:3000/login)
+        const loginUrl = getTenantUrl(tenantSlug, '/login');
+
         const { data, error } = await resend.emails.send({
             from: process.env.EMAIL_FROM || 'SI-MITRA-DUDIKA <onboarding@resend.dev>',
             to: [email],
@@ -22,7 +26,8 @@ const sendInviteEmail = async (email, tempPassword, unitName, roleName) => {
                         <p style="margin: 5px 0;"><strong>Password Sementara:</strong> <span style="font-family: monospace; background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tempPassword}</span></p>
                     </div>
 
-                    <p>Silakan login di <a href="http://localhost:3000/login" style="color: #4f46e5; text-decoration: none;">http://localhost:3000/login</a> dan ganti password Anda segera setelah login pertama kali.</p>
+                    <!-- ✅ 4. GUNAKAN VARIABLE loginUrl YANG SUDAH DINAMIS -->
+                    <p>Silakan login di <a href="${loginUrl}" style="color: #4f46e5; text-decoration: none; font-weight: bold;">${loginUrl}</a> dan ganti password Anda segera setelah login pertama kali.</p>
                     
                     <p style="color: #6b7280; font-size: 12px; margin-top: 30px;">
                         * Email ini dikirim secara otomatis oleh sistem. Mohon jangan membalas email ini.
@@ -44,5 +49,4 @@ const sendInviteEmail = async (email, tempPassword, unitName, roleName) => {
     }
 };
 
-// EKSPOR FUNGSI INI
 module.exports = { sendInviteEmail };

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk | <%= typeof tenant !== 'undefined' && tenant ? tenant.name : 'SIMITRADUDIKA' %></title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi & Transisi -->
+  <style>
+    .transition-smooth { transition: all 0.2s ease-in-out; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+  </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8 font-sans text-slate-900 antialiased selection:bg-primary-100 selection:text-primary-700 relative overflow-hidden">
+
+  <!-- Decorative Background Blobs (Subtle) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Wrapper Utama Split Screen -->
+  <div class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl border border-slate-200/60 flex overflow-hidden min-h-[600px] animate-fade-in relative z-10">
+
+    <!-- ========================================== -->
+    <!-- LEFT PANEL: Branding & Sapaan Personal -->
+    <!-- ========================================== -->
+    <div class="hidden lg:flex w-2/5 bg-slate-900 p-10 flex-col justify-between text-white relative">
+      
+      <!-- Background Image Lokal (Ganti dengan aset lokal kamu, misal: /images/campus-bg.jpg) -->
+      <!-- Fallback gradient akan tetap membuat ini terlihat bagus jika gambar belum ada -->
+      <img src="/images/campus-bg.jpg" 
+           alt="Campus Background" 
+           class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay"
+           onerror="this.style.display='none'">
+      
+      <!-- Gradient Overlay agar teks tetap terbaca jelas -->
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-900/95 to-slate-900/95 z-0"></div>
+
+      <div class="relative z-10">
+        <!-- Header Dinamis Berdasarkan Tenant -->
+        <div class="flex items-center gap-3 mb-8">
+          <div class="bg-primary-500/20 border border-primary-500/30 w-10 h-10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+            <i data-lucide="building-2" class="w-5 h-5 text-primary-300"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold tracking-tight text-white">
+              <%= typeof tenant !== 'undefined' && tenant ? tenant.name : 'SIMITRADUDIKA' %>
+            </h1>
+            <p class="text-xs text-primary-200 font-medium">Portal Resmi Institusi</p>
+          </div>
+        </div>
+
+        <!-- Sapaan yang Bersih dan Ramah -->
+        <h2 class="text-3xl font-bold mb-4 leading-tight text-white">Selamat Datang Kembali.</h2>
+        <p class="text-sm text-slate-300 leading-relaxed max-w-xs">
+          Silakan masukkan kredensial Anda untuk mengakses dashboard manajemen kerjasama industri dan akademik.
+        </p>
+      </div>
+
+      <!-- Footer Sederhana -->
+      <div class="relative z-10 pt-8 border-t border-slate-700/50">
+        <p class="text-xs text-slate-400">© 2026 SIMITRADUDIKA. Lingkungan Simulasi Skripsi.</p>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- RIGHT PANEL: Form Login -->
+    <!-- ========================================== -->
+    <div class="w-full lg:w-3/5 p-6 md:p-10 flex flex-col bg-white justify-center">
+      
+      <!-- Mobile Header (Hanya muncul di layar kecil) -->
+      <div class="lg:hidden text-center mb-8">
+        <a href="/" class="inline-flex items-center gap-2 text-slate-900 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity mb-4">
+          <div class="bg-primary-600 text-white p-2 rounded-lg shadow-lg shadow-primary-500/30">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          SIMITRA<span class="text-primary-600">DUDIKA</span>
+        </a>
+        <h2 class="text-xl font-bold text-slate-900">
+          <%= typeof tenant !== 'undefined' && tenant ? tenant.name : 'Portal Institusi' %>
+        </h2>
+      </div>
+
+      <!-- Desktop Header -->
+      <div class="hidden lg:block mb-8">
+        <h2 class="text-2xl font-bold text-slate-900">Masuk ke Akun Anda</h2>
+        <p class="text-sm text-slate-500 mt-1">Masukkan kredensial pengelola untuk melanjutkan.</p>
+      </div>
+
+      <!-- Error Message Handling -->
+      <% if (locals.error) { %>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-3 animate-fade-in">
+          <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-semibold mb-0.5">Login Gagal</p>
+            <% if (error.includes('pending_approval') || error.includes('review')) { %>
+              <p>Akun institusi Anda masih dalam proses verifikasi oleh admin platform.</p>
+            <% } else if (error.includes('suspended') || error.includes('ditangguhkan')) { %>
+              <p>Akun institusi Anda telah ditangguhkan. Silakan hubungi admin platform.</p>
+            <% } else if (error.includes('ditolak') || error.includes('rejected')) { %>
+              <p>Pendaftaran institusi Anda telah ditolak.</p>
+            <% } else { %>
+              <p><%= error %></p>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Form Login -->
+      <form action="/login" method="POST" class="space-y-5 flex-1 flex flex-col" id="loginForm" novalidate>
+        
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Institusi</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="email" 
+              name="email" 
+              value="<%= typeof oldInput !== 'undefined' && oldInput && oldInput.email ? oldInput.email : '' %>"
+              required 
+              class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" 
+              placeholder="nama@kampus.ac.id"
+              autocomplete="email"
+            >
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-sm font-semibold text-slate-700">Password</label>
+            <!-- Opsional: <a href="/forgot-password" class="text-xs text-primary-600 hover:text-primary-700 font-medium hover:underline">Lupa password?</a> -->
+          </div>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input 
+              type="password" 
+              name="password" 
+              id="password"
+              required 
+              class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" 
+              placeholder="••••••••"
+              autocomplete="current-password"
+            >
+            <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1" aria-label="Toggle password visibility">
+              <i data-lucide="eye" class="w-4 h-4 icon-eye-open"></i>
+              <i data-lucide="eye-off" class="w-4 h-4 icon-eye-closed hidden"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button type="submit" id="submitBtn" class="w-full bg-primary-600 text-white font-semibold py-3 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+            <span id="btnText">Masuk ke Dashboard</span>
+            <i data-lucide="arrow-right" id="btnIcon" class="w-4 h-4"></i>
+            <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Footer Links (Disederhanakan & Relevan untuk Tenant) -->
+      <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+        <p class="text-xs text-slate-500 flex items-center justify-center gap-1.5 mb-2">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          Koneksi Anda diamankan dengan enkripsi standar industri.
+        </p>
+        <p class="text-xs text-slate-400">
+          Lupa password atau butuh bantuan? 
+          <a href="mailto:support@<%= typeof tenant !== 'undefined' && tenant && tenant.slug ? tenant.slug : 'saas' %>.local" class="text-primary-600 hover:text-primary-700 font-medium hover:underline transition-colors">Hubungi Admin IT</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Inisialisasi Ikon
+    lucide.createIcons();
+
+    // Toggle Password Visibility
+    function togglePassword(inputId, button) {
+      const input = document.getElementById(inputId);
+      const iconOpen = button.querySelector('.icon-eye-open');
+      const iconClosed = button.querySelector('.icon-eye-closed');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        iconOpen.classList.add('hidden');
+        iconClosed.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        iconOpen.classList.remove('hidden');
+        iconClosed.classList.add('hidden');
+      }
+      lucide.createIcons(); // Re-render icons setelah perubahan
+    }
+
+    // Animasi Loading saat Submit
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', function(e) {
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      const btnSpinner = document.getElementById('btnSpinner');
+      
+      // Validasi sederhana di frontend sebelum submit
+      const email = form.querySelector('input[name="email"]').value;
+      const password = form.querySelector('input[name="password"]').value;
+      
+      if (!email || !password) {
+        e.preventDefault();
+        return; // Biarkan HTML5 validation menangani ini
+      }
+
+      submitBtn.disabled = true;
+      btnText.textContent = 'Memverifikasi...';
+      btnIcon.classList.add('hidden');
+      btnSpinner.classList.remove('hidden');
+    });
+  </script>
+
+  <!-- Global Script (jika ada fungsi reusable) -->
+  <script src="/js/script.js"></script>
+</body>
+</html>

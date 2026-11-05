@@ -1,21 +1,96 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Halaman Tidak Ditemukan | SIMITRADUDIKA</title>
-    <!-- Sesuaikan script Tailwind ini dengan cara project Anda memuat Tailwind (misal via CDN atau build process) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Halaman Tidak Ditemukan | SIMITRADUDIKA</title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi -->
+  <style>
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .animate-float { animation: float 4s ease-in-out infinite; }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="text-center px-4">
-            <h1 class="text-6xl font-bold text-gray-800 mb-4">404</h1>
-            <p class="text-xl text-gray-600 mb-8">Maaf, halaman yang Anda cari tidak ditemukan.</p>
-            <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm">
-                Kembali ke Beranda
-            </a>
-        </div>
+
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-sans text-slate-900 antialiased selection:bg-primary-100 selection:text-primary-700">
+  
+  <!-- Decorative Background Blobs (Konsisten dengan halaman lain) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="text-center max-w-lg w-full animate-fade-in-up relative z-10">
+    
+    <!-- Illustration / Icon Area -->
+    <div class="relative mb-8">
+      <!-- Large Background Number -->
+      <h1 class="text-[10rem] leading-none font-extrabold text-slate-200 tracking-tighter select-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
+        404
+      </h1>
+      
+      <!-- Floating Icon Card -->
+      <div class="relative z-10 bg-white/80 backdrop-blur-sm w-24 h-24 rounded-2xl flex items-center justify-center mx-auto shadow-xl border border-slate-200/60 animate-float">
+        <i data-lucide="search-x" class="w-10 h-10 text-primary-600"></i>
+      </div>
     </div>
+
+    <!-- Text Content -->
+    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-3">
+      Halaman Tidak Ditemukan
+    </h2>
+    <p class="text-slate-500 text-base md:text-lg mb-8 leading-relaxed max-w-md mx-auto">
+      Maaf, tautan yang Anda ikuti mungkin sudah kedaluwarsa, salah ketik, atau halaman ini sedang dalam tahap pengembangan.
+    </p>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+      <a href="/" class="inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm w-full sm:w-auto">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Kembali ke Beranda
+      </a>
+      
+      <button onclick="window.history.back()" class="inline-flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-semibold text-sm w-full sm:w-auto">
+        <i data-lucide="corner-up-left" class="w-4 h-4"></i>
+        Kembali ke Sebelumnya
+      </button>
+    </div>
+
+    <!-- Footer Support Link -->
+    <div class="pt-6 border-t border-slate-200/60">
+      <p class="text-xs text-slate-400">
+        Masih mengalami masalah? 
+        <a href="mailto:support@simitradudika.id" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors font-medium">
+          Hubungi Tim Support
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Inisialisasi Icon Lucide
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
+
+  <!-- Global Script -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

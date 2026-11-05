@@ -1,9 +1,9 @@
-<aside class="w-64 bg-slate-950 text-slate-400 flex flex-col h-screen fixed left-0 top-0 border-r border-slate-800/60 hidden md:flex z-30">
+<aside class="w-64 bg-slate-950 text-slate-400 flex flex-col h-screen fixed left-0 top-0 border-r border-slate-800/60 hidden md:flex z-30 transition-all duration-300">
   
   <!-- 1. Brand Header -->
   <div class="h-16 flex items-center px-6 border-b border-slate-800/60 shrink-0">
     <div class="flex items-center gap-3">
-      <div class="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-500/20">
+      <div class="bg-primary-600 p-1.5 rounded-lg shadow-lg shadow-primary-500/20">
         <i data-lucide="box" class="w-5 h-5 text-white"></i>
       </div>
       <div class="flex flex-col">
@@ -13,29 +13,36 @@
     </div>
   </div>
 
-  <!-- 2. Main Navigation (Hanya Menu yang Sudah Berfungsi) -->
-  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
+  <!-- 2. Main Navigation (Dinamis Berdasarkan Role) -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar" aria-label="Navigasi Utama">
     
     <!-- GROUP: UTAMA -->
     <div>
       <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Menu Utama</p>
       <div class="space-y-1">
-        <a href="/dashboard" data-path="/dashboard" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+        <!-- Dashboard: Semua user tenant yang terautentikasi bisa akses -->
+        <a href="/dashboard" data-path="/dashboard" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200" aria-label="Dashboard">
           <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
           <span>Dashboard</span>
         </a>
         
-        <a href="/kerjasama" data-path="/kerjasama" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+        <!-- Kerjasama: Semua role tenant punya akses read -->
+        <a href="/kerjasama" data-path="/kerjasama" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200" aria-label="Dokumen Kerjasama">
           <i data-lucide="file-signature" class="w-4 h-4"></i>
           <span>Kerjasama</span>
         </a>
 
-        <% if (typeof isTenant !== 'undefined' && isTenant) { %>
-          <a href="/mitra" data-path="/mitra" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+        <!-- Data Mitra: Hanya muncul jika punya izin 'read:mitra' -->
+        <% if (typeof can === 'function' && can(user.role, 'read:mitra')) { %>
+          <a href="/mitra" data-path="/mitra" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200" aria-label="Data Mitra">
             <i data-lucide="briefcase" class="w-4 h-4"></i>
             <span>Data Mitra</span>
           </a>
-          <a href="/users" data-path="/users" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+        <% } %>
+
+        <!-- Kelola Tim: Hanya muncul jika punya izin 'read:users' -->
+        <% if (typeof can === 'function' && can(user.role, 'read:users')) { %>
+          <a href="/users" data-path="/users" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200" aria-label="Kelola Tim">
             <i data-lucide="users" class="w-4 h-4"></i>
             <span>Kelola Tim</span>
           </a>
@@ -43,14 +50,14 @@
       </div>
     </div>
 
-    <!-- GROUP: PLATFORM ADMIN (Conditional) -->
+    <!-- GROUP: PLATFORM ADMIN (Konteks berbeda, tetap menggunakan isPlatform) -->
     <% if (typeof isPlatform !== 'undefined' && isPlatform) { %>
     <div>
       <p class="px-3 text-[10px] font-bold text-amber-500/70 uppercase tracking-widest mb-2 flex items-center gap-1.5">
         <i data-lucide="shield" class="w-3 h-3"></i> Platform Owner
       </p>
       <div class="space-y-1">
-        <a href="/platform/dashboard" data-path="/platform/dashboard" class="nav-link flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200">
+        <a href="/platform/dashboard" data-path="/platform/dashboard" class="nav-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200" aria-label="Dashboard Platform">
           <i data-lucide="monitor" class="w-4 h-4"></i>
           <span>Dashboard Platform</span>
         </a>
@@ -61,9 +68,9 @@
 
   <!-- 3. Footer: Compact & Unified -->
   <div class="p-3 border-t border-slate-800/60 shrink-0">
-    <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-800/60">
+    <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-800/60 backdrop-blur-sm">
       <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-800/60">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md shrink-0">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md shrink-0 ring-2 ring-slate-900">
           <%= (typeof user !== 'undefined' && user.name ? user.name : 'A').charAt(0).toUpperCase() %>
         </div>
         <div class="flex-1 min-w-0">
@@ -71,7 +78,7 @@
             <%= typeof user !== 'undefined' && user.name ? user.name : 'Administrator' %>
           </p>
           <p class="text-[10px] text-slate-500 truncate">
-            <%= typeof user !== 'undefined' && user.role ? user.role : 'Super Admin' %>
+            <%= typeof user !== 'undefined' && user.role ? user.role.replace('_', ' ').toUpperCase() : 'Super Admin' %>
           </p>
         </div>
       </div>
@@ -85,7 +92,7 @@
           <span class="text-[10px] font-medium text-emerald-400">Sistem Aman</span>
         </div>
         <form action="/logout" method="POST">
-          <button type="submit" title="Keluar" class="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-all">
+          <button type="submit" title="Keluar dari Sistem" aria-label="Keluar dari sistem" class="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
         </form>
@@ -94,67 +101,92 @@
   </div>
 </aside>
 
-<!-- Mobile Bottom Navigation (Disesuaikan dengan menu desktop) -->
-<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 z-40 pb-safe">
+<!-- Mobile Bottom Navigation (Disesuaikan dengan RBAC) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-800 z-40 pb-safe" aria-label="Navigasi Mobile">
   <div class="grid grid-cols-3 h-16">
-    <a href="/dashboard" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
+    <a href="/dashboard" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary-400 transition-colors" aria-label="Home">
       <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
       <span class="text-[10px] font-medium">Home</span>
     </a>
-    <a href="/kerjasama" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
+    <a href="/kerjasama" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary-400 transition-colors" aria-label="MoU">
       <i data-lucide="file-signature" class="w-5 h-5"></i>
       <span class="text-[10px] font-medium">MoU</span>
     </a>
-    <% if (typeof isTenant !== 'undefined' && isTenant) { %>
-    <a href="/mitra" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
-      <i data-lucide="briefcase" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">Mitra</span>
-    </a>
+    
+    <!-- Slot ke-3 dinamis berdasarkan izin tertinggi yang tersedia -->
+    <% if (typeof can === 'function' && can(user.role, 'read:users')) { %>
+      <a href="/users" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary-400 transition-colors" aria-label="Tim">
+        <i data-lucide="users" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Tim</span>
+      </a>
+    <% } else if (typeof can === 'function' && can(user.role, 'read:mitra')) { %>
+      <a href="/mitra" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary-400 transition-colors" aria-label="Mitra">
+        <i data-lucide="briefcase" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Mitra</span>
+      </a>
     <% } else { %>
-    <a href="/users" class="mobile-nav flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-indigo-400 transition-colors">
-      <i data-lucide="users" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">Tim</span>
-    </a>
+      <!-- Fallback jika user sangat terbatas (misal: auditor khusus log) -->
+      <div class="flex flex-col items-center justify-center gap-1 text-slate-700" aria-hidden="true">
+        <i data-lucide="lock" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">-</span>
+      </div>
     <% } %>
   </div>
 </nav>
 
 <style>
+  /* Custom Scrollbar untuk Sidebar */
   .custom-scrollbar::-webkit-scrollbar { width: 4px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgb(51 65 85); border-radius: 20px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; } /* slate-700 */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; } /* slate-600 */
   
-  .nav-link { color: rgb(148 163 184); }
-  .nav-link:hover { background-color: rgb(30 41 59); color: rgb(241 245 249); }
+  /* State Navigasi Sidebar (Menggunakan hex yang sesuai dengan primary-500/400) */
+  .nav-link { color: #94a3b8; } /* slate-400 */
+  .nav-link:hover { background-color: #1e293b; color: #f1f5f9; } /* slate-800, slate-100 */
   
   .nav-link.active {
-    background-color: rgba(99, 102, 241, 0.1);
-    color: rgb(129 140 248);
-    border-left: 3px solid rgb(99, 102, 241);
+    background-color: rgba(99, 102, 241, 0.15); /* primary-500 dengan opacity 15% */
+    color: #818cf8; /* primary-400 */
+    border-left: 3px solid #6366f1; /* primary-500 */
     font-weight: 600;
   }
-  .nav-link.active i { color: rgb(129 140 248); }
-  .mobile-nav.active { color: rgb(129 140 248); }
+  .nav-link.active i { color: #818cf8; } /* primary-400 */
+  
+  /* State Navigasi Mobile */
+  .mobile-nav.active { color: #818cf8; } /* primary-400 */
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
+    
+    // Fungsi helper untuk mengecek kecocokan path
     const isActive = (linkPath) => {
       if (linkPath === '/') return currentPath === '/';
       return currentPath === linkPath || currentPath.startsWith(linkPath + '/');
     };
 
+    // Terapkan state active pada sidebar desktop
     document.querySelectorAll('.nav-link').forEach(link => {
       const linkPath = link.getAttribute('data-path');
-      if (linkPath && isActive(linkPath)) link.classList.add('active');
+      if (linkPath && isActive(linkPath)) {
+        link.classList.add('active');
+      }
     });
     
+    // Terapkan state active pada mobile bottom nav
     document.querySelectorAll('.mobile-nav').forEach(link => {
+      // Gunakan pathname dari href untuk akurasi
       const linkPath = new URL(link.href, window.location.origin).pathname;
-      if (isActive(linkPath)) link.classList.add('active');
+      if (isActive(linkPath)) {
+        link.classList.add('active');
+      }
     });
     
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    // Inisialisasi ikon Lucide
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   });
 </script>

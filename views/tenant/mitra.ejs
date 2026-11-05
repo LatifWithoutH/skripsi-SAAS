@@ -1,140 +1,196 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelola Mitra | SIMITRADUDIKA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi -->
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans">
-  <div class="flex">
+
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-700">
+  <div class="flex min-h-screen">
+    
+    <!-- 1. SIDEBAR PARTIAL -->
     <%- include('../partials/_sidebar', { isTenant: true }) %>
     
+    <!-- 2. MAIN CONTENT AREA -->
     <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
-      <%- include('../partials/_header', { user: user }) %>
+      
+      <!-- HEADER PARTIAL -->
+      <%- include('../partials/_header', { 
+        user: typeof user !== 'undefined' ? user : { name: 'Admin', role: 'super_admin' },
+        tenantName: typeof tenantName !== 'undefined' ? tenantName : 'SIMITRADUDIKA',
+        pageTitle: 'Data Mitra'
+      }) %>
 
-      <main class="flex-1 p-6 md:p-8">
-        <!-- Header & Notifikasi -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      <main class="flex-1 p-4 md:p-8 space-y-6">
+        
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Data Mitra Kerja Sama</h1>
-            <p class="text-gray-500">Kelola daftar mitra industri dan institusi.</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Data Mitra Kerja Sama</h1>
+            <p class="text-slate-500 text-sm mt-1">Kelola daftar mitra industri dan institusi secara terpusat.</p>
           </div>
           
-          <% if (user.role !== 'auditor') { %>
-            <button onclick="openAddModal()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium">
+          <!-- Tombol Tambah (Hanya muncul jika punya izin 'write:mitra') -->
+          <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:mitra')) { %>
+            <button onclick="openAddModal()" class="inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm">
               <i data-lucide="plus" class="w-4 h-4"></i> Tambah Mitra
             </button>
           <% } %>
         </div>
 
         <!-- Notifikasi Sukses/Gagal -->
-        <% if (locals.success === 'mitra_added' || locals.success === 'mitra_added_and_invited') { %>
-          <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Mitra berhasil ditambahkan ke direktori!
-          </div>
-        <% } else if (locals.success === 'mitra_updated') { %>
-          <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Data kontak mitra berhasil diperbarui!
-          </div>
-        <% } else if (locals.success === 'mitra_removed') { %>
-          <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Relasi dengan mitra berhasil dihapus.
-          </div>
-        <% } else if (locals.success === 'mitra_added_existing_pic') { %>
-          <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="info" class="w-5 h-5"></i> Mitra ditambahkan! PIC sudah memiliki akun, silakan beri tahu mereka untuk login.
-          </div>
-        <% } %>
+        <% if (typeof locals !== 'undefined') { %>
+          <% if (locals.success === 'mitra_added' || locals.success === 'mitra_added_and_invited') { %>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="check-circle-2" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Berhasil!</p>
+                <p class="text-xs text-emerald-600 mt-0.5">Mitra berhasil ditambahkan ke direktori.</p>
+              </div>
+            </div>
+          <% } else if (locals.success === 'mitra_updated') { %>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="check-circle-2" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Berhasil!</p>
+                <p class="text-xs text-emerald-600 mt-0.5">Data kontak mitra berhasil diperbarui.</p>
+              </div>
+            </div>
+          <% } else if (locals.success === 'mitra_removed') { %>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="check-circle-2" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Berhasil!</p>
+                <p class="text-xs text-emerald-600 mt-0.5">Relasi dengan mitra berhasil dihapus.</p>
+              </div>
+            </div>
+          <% } else if (locals.success === 'mitra_added_existing_pic') { %>
+            <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Mitra Ditambahkan</p>
+                <p class="text-xs text-blue-600 mt-0.5">PIC sudah memiliki akun, silakan beri tahu mereka untuk login.</p>
+              </div>
+            </div>
+          <% } %>
 
-        <% if (locals.warning === 'email_failed') { %>
-          <div class="mb-6 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="alert-triangle" class="w-5 h-5"></i> Mitra ditambahkan, tetapi gagal mengirim email undangan.
-          </div>
-        <% } %>
+          <% if (locals.warning === 'email_failed') { %>
+            <div class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Peringatan</p>
+                <p class="text-xs text-amber-600 mt-0.5">Mitra ditambahkan, tetapi gagal mengirim email undangan.</p>
+              </div>
+            </div>
+          <% } %>
 
-        <% if (locals.error === 'mitra_sudah_ada_di_tenant_ini') { %>
-          <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="alert-circle" class="w-5 h-5"></i> Mitra ini sudah ada di daftar Anda.
-          </div>
-        <% } else if (locals.error) { %>
-          <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <i data-lucide="alert-circle" class="w-5 h-5"></i> Terjadi kesalahan. Silakan coba lagi.
-          </div>
+          <% if (locals.error === 'mitra_sudah_ada_di_tenant_ini') { %>
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Gagal</p>
+                <p class="text-xs text-red-600 mt-0.5">Mitra ini sudah ada di daftar Anda.</p>
+              </div>
+            </div>
+          <% } else if (locals.error) { %>
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 animate-fade-in">
+              <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-semibold text-sm">Terjadi Kesalahan</p>
+                <p class="text-xs text-red-600 mt-0.5"><%= locals.error %></p>
+              </div>
+            </div>
+          <% } %>
         <% } %>
 
         <!-- Tabel Data -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <% if (mitras && mitras.length > 0) { %>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+          <% if (typeof mitras !== 'undefined' && mitras && mitras.length > 0) { %>
             <div class="overflow-x-auto">
               <table class="w-full text-sm text-left">
-                <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100 uppercase text-xs tracking-wider">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-xs tracking-wider">
                   <tr>
                     <th class="px-6 py-4">Perusahaan</th>
                     <th class="px-6 py-4">Industri</th>
                     <th class="px-6 py-4">PIC di Kampus Ini</th>
                     <th class="px-6 py-4">Status Akun</th>
-                    <% if (user.role !== 'auditor') { %>
+                    <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:mitra')) { %>
                       <th class="px-6 py-4 text-right">Aksi</th>
                     <% } %>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-slate-100">
                   <% mitras.forEach(function(m) { %>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-slate-50/80 transition-colors">
                       <td class="px-6 py-4">
                         <div class="flex flex-col">
                           <div class="flex items-center gap-2">
-                            <span class="font-medium text-gray-900"><%= m.name %></span>
+                            <span class="font-semibold text-slate-900"><%= m.name %></span>
                             <% if (m.verified) { %>
-                              <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-semibold">✓ Verified</span>
+                              <span class="text-[10px] bg-primary-50 text-primary-700 border border-primary-100 px-1.5 py-0.5 rounded font-semibold">✓ Verified</span>
                             <% } %>
                           </div>
                           <% if (m.website) { %>
-                            <a href="<%= m.website %>" target="_blank" class="text-xs text-indigo-600 hover:underline mt-1">
-                              <%= m.website.replace(/^https?:\/\//, '') %>
+                            <a href="<%= m.website %>" target="_blank" rel="noopener noreferrer" class="text-xs text-primary-600 hover:text-primary-700 hover:underline mt-1 truncate max-w-[200px]">
+                              <%= m.website.replace(/^https?:\/\//, '').replace(/\/$/, '') %>
                             </a>
                           <% } %>
                         </div>
                       </td>
-                      <td class="px-6 py-4 text-gray-600"><%= m.industry || '-' %></td>
+                      <td class="px-6 py-4 text-slate-600"><%= m.industry || '-' %></td>
                       <td class="px-6 py-4">
-                        <div class="font-medium text-gray-900"><%= m.contact_name || 'Belum ada PIC' %></div>
+                        <div class="font-medium text-slate-900"><%= m.contact_name || 'Belum ada PIC' %></div>
                         <% if (m.contact_email) { %>
-                          <div class="text-xs text-gray-500"><%= m.contact_email %></div>
+                          <div class="text-xs text-slate-500"><%= m.contact_email %></div>
                         <% } %>
                         <% if (m.contact_phone) { %>
-                          <div class="text-xs text-gray-500"><%= m.contact_phone %></div>
+                          <div class="text-xs text-slate-500"><%= m.contact_phone %></div>
                         <% } %>
                       </td>
                       
-                      <!-- ✅ PERBAIKAN: Status Dinamis Berdasarkan account_status -->
+                      <!-- Status Dinamis Berdasarkan account_status -->
                       <td class="px-6 py-4">
                         <% if (m.account_status === 'pending_invite') { %>
-                          <span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-xs font-semibold w-fit">
                             <i data-lucide="clock" class="w-3 h-3"></i> Menunggu Aktivasi
                           </span>
                         <% } else if (m.account_status === 'active') { %>
-                          <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
-                            <i data-lucide="check-circle" class="w-3 h-3"></i> Aktif
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-xs font-semibold w-fit">
+                            <i data-lucide="check-circle-2" class="w-3 h-3"></i> Aktif
                           </span>
                         <% } else { %>
-                          <span class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-xs font-semibold w-fit">
                             <i data-lucide="user-x" class="w-3 h-3"></i> Belum Ada Akun
                           </span>
                         <% } %>
                       </td>
                       
-                      <% if (user.role !== 'auditor') { %>
+                      <!-- Tombol Aksi -->
+                      <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:mitra')) { %>
                         <td class="px-6 py-4 text-right">
                           <div class="flex items-center justify-end gap-2">
-                            <button onclick='openEditModal(<%- JSON.stringify(m) %>)' 
-                              class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit PIC">
-                              <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            <button onclick='openEditModal(JSON.parse(decodeURIComponent(this.dataset.mitra)))' data-mitra="<%= encodeURIComponent(JSON.stringify(m)) %>" 
+                              class="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all" title="Edit PIC">
+                              <i data-lucide="pencil" class="w-4 h-4"></i>
                             </button>
-                            <form action="/mitra/delete/<%= m.id %>" method="POST" onsubmit="return confirm('Yakin hapus relasi dengan <%= m.name %>? Data perusahaan tetap ada di sistem global.')">
-                              <button type="submit" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus Relasi">
+                            <form action="/mitra/delete/<%= m.id %>" method="POST" data-name="<%= encodeURIComponent(m.name) %>" onsubmit="return confirm('Yakin hapus relasi dengan ' + decodeURIComponent(this.dataset.name) + '? Data perusahaan tetap ada di sistem global.')">
+                              <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Hapus Relasi">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                               </button>
                             </form>
@@ -147,14 +203,18 @@
               </table>
             </div>
           <% } else { %>
+            <!-- Empty State -->
             <div class="p-12 text-center">
-              <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="building-2" class="w-8 h-8 text-gray-400"></i>
+              <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="building-2" class="w-8 h-8 text-slate-400"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Belum ada data mitra</h3>
-              <p class="text-gray-500 mt-1 mb-4">Mulai tambahkan mitra kerja sama institusi Anda.</p>
-              <% if (user.role !== 'auditor') { %>
-                <button onclick="openAddModal()" class="text-indigo-600 font-semibold hover:underline">Tambah Mitra Pertama</button>
+              <h3 class="text-lg font-semibold text-slate-900">Belum ada data mitra</h3>
+              <p class="text-slate-500 text-sm mt-1 mb-6 max-w-sm mx-auto">Mulai tambahkan mitra kerja sama institusi Anda untuk membangun kolaborasi.</p>
+              
+              <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:mitra')) { %>
+                <button onclick="openAddModal()" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700 hover:underline transition-colors">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Mitra Pertama
+                </button>
               <% } %>
             </div>
           <% } %>
@@ -163,120 +223,133 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH MITRA -->
-  <% if (user.role !== 'auditor') { %>
-    <div id="addMitraModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white z-10">
-          <h3 class="text-lg font-bold text-gray-900">Tambah Mitra Baru</h3>
-          <button onclick="closeAddModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full">
+  <!-- MODAL: Tambah Mitra (Hanya di-render jika punya izin) -->
+  <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:mitra')) { %>
+    <!-- MODAL TAMBAH MITRA -->
+    <div id="addMitraModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 transition-opacity duration-300">
+      <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="building" class="w-5 h-5 text-primary-600"></i> Tambah Mitra Baru
+          </h3>
+          <button onclick="closeAddModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Tutup modal">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
         
-        <form action="/mitra/create" method="POST" class="p-6 space-y-4">
-          <div class="border-b pb-4 mb-4">
-            <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <i data-lucide="building" class="w-4 h-4"></i> Data Perusahaan (Global)
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Perusahaan <span class="text-red-500">*</span></label>
-                <input type="text" name="name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Contoh: PT Telkom Indonesia">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Industri</label>
-                <select name="industry" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
-                  <option value="">-- Pilih Industri --</option>
-                  <option value="Telekomunikasi">Telekomunikasi</option>
-                  <option value="Teknologi/Startup">Teknologi/Startup</option>
-                  <option value="Perbankan">Perbankan</option>
-                  <option value="Manufaktur">Manufaktur</option>
-                  <option value="Pemerintahan">Pemerintahan</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                <input type="url" name="website" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="https://...">
+        <div class="overflow-y-auto p-6 custom-scrollbar">
+          <form action="/mitra/create" method="POST" class="space-y-6">
+            <div class="border-b border-slate-100 pb-6">
+              <h4 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <i data-lucide="globe" class="w-4 h-4 text-slate-400"></i> Data Perusahaan (Global)
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Perusahaan <span class="text-red-500">*</span></label>
+                  <input type="text" name="name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="Contoh: PT Telkom Indonesia">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Industri</label>
+                  <div class="relative">
+                    <select name="industry" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
+                      <option value="">-- Pilih Industri --</option>
+                      <option value="Telekomunikasi">Telekomunikasi</option>
+                      <option value="Teknologi/Startup">Teknologi/Startup</option>
+                      <option value="Perbankan">Perbankan</option>
+                      <option value="Manufaktur">Manufaktur</option>
+                      <option value="Pemerintahan">Pemerintahan</option>
+                      <option value="Lainnya">Lainnya</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Website</label>
+                  <input type="url" name="website" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="https://...">
+                </div>
               </div>
             </div>
-          </div>
 
-          <div>
-            <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <i data-lucide="user" class="w-4 h-4"></i> PIC di Kampus Ini
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
-                <input type="text" name="contact_name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Nama penanggung jawab">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email PIC</label>
-                <input type="email" name="contact_email" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="pic@perusahaan.com">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">No. HP / WhatsApp</label>
-                <input type="tel" name="contact_phone" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="0812...">
+            <div>
+              <h4 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i> PIC di Kampus Ini
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama PIC</label>
+                  <input type="text" name="contact_name" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="Nama penanggung jawab">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email PIC</label>
+                  <input type="email" name="contact_email" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="pic@perusahaan.com">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">No. HP / WhatsApp</label>
+                  <input type="tel" name="contact_phone" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="0812...">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-1.5">Catatan Internal</label>
+                  <textarea name="notes" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400 resize-none" placeholder="Catatan tambahan..."></textarea>
+                </div>
               </div>
             </div>
-            <div class="mt-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Internal</label>
-              <textarea name="notes" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Catatan tambahan..."></textarea>
-            </div>
-          </div>
 
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 sticky bottom-0 bg-white">
-            <button type="button" onclick="closeAddModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-            <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
-              <i data-lucide="save" class="w-4 h-4"></i> Simpan Mitra
-            </button>
-          </div>
-        </form>
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <button type="button" onclick="closeAddModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">Batal</button>
+              <button type="submit" class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
+                <i data-lucide="save" class="w-4 h-4"></i> Simpan Mitra
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
     <!-- MODAL EDIT PIC MITRA -->
-    <div id="editMitraModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 class="text-lg font-bold text-gray-900">Edit PIC Mitra</h3>
-          <button onclick="closeEditModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full">
+    <div id="editMitraModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 transition-opacity duration-300">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="pencil" class="w-5 h-5 text-primary-600"></i> Edit PIC Mitra
+          </h3>
+          <button onclick="closeEditModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Tutup modal">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
         
-        <form id="editMitraForm" method="POST" class="p-6 space-y-4">
+        <form id="editMitraForm" method="POST" class="p-6 space-y-5">
           <input type="hidden" name="mitra_id" id="edit_mitra_id">
           
-          <div class="bg-indigo-50 p-3 rounded-lg mb-4">
-            <p class="text-sm text-indigo-800 font-medium" id="edit_mitra_name">Nama Perusahaan</p>
-            <p class="text-xs text-indigo-600">Hanya mengubah data kontak untuk kampus Anda.</p>
+          <div class="bg-primary-50 border border-primary-100 p-4 rounded-xl flex gap-3 items-start">
+            <i data-lucide="info" class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-semibold text-primary-900" id="edit_mitra_name">Nama Perusahaan</p>
+              <p class="text-xs text-primary-700 mt-1 leading-relaxed">Hanya mengubah data kontak untuk kampus Anda. Data global tidak akan terpengaruh.</p>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
-              <input type="text" name="contact_name" id="edit_contact_name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama PIC</label>
+              <input type="text" name="contact_name" id="edit_contact_name" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email PIC</label>
-              <input type="email" name="contact_email" id="edit_contact_email" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email PIC</label>
+              <input type="email" name="contact_email" id="edit_contact_email" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400">
             </div>
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1">No. HP / WhatsApp</label>
-              <input type="tel" name="contact_phone" id="edit_contact_phone" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">No. HP / WhatsApp</label>
+              <input type="tel" name="contact_phone" id="edit_contact_phone" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">Catatan Internal</label>
+              <textarea name="notes" id="edit_notes" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400 resize-none"></textarea>
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Internal</label>
-            <textarea name="notes" id="edit_notes" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"></textarea>
-          </div>
 
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-            <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-            <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">Batal</button>
+            <button type="submit" class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
               <i data-lucide="save" class="w-4 h-4"></i> Perbarui Data
             </button>
           </div>
@@ -285,16 +358,22 @@
     </div>
   <% } %>
 
+  <!-- SCRIPTS -->
   <script>
     function openAddModal() {
       const modal = document.getElementById('addMitraModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
     }
+    
     function closeAddModal() {
       const modal = document.getElementById('addMitraModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
     }
 
     function openEditModal(mitra) {
@@ -308,15 +387,21 @@
       document.getElementById('editMitraForm').action = `/mitra/update/${mitra.id}`;
       
       const modal = document.getElementById('editMitraModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
     }
+    
     function closeEditModal() {
       const modal = document.getElementById('editMitraModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
     }
 
+    // Close modal when clicking outside
     window.onclick = function(event) {
       const addModal = document.getElementById('addMitraModal');
       const editModal = document.getElementById('editMitraModal');
@@ -324,7 +409,13 @@
       if (event.target === editModal) closeEditModal();
     }
 
-    lucide.createIcons();
+    // Initialize Lucide Icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   </script>
+
+  <!-- Global Script -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

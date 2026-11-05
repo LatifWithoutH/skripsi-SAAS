@@ -3,53 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aktivasi Akun | Portal Mitra - SI-MITRA-DUDIKA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          animation: {
-            'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
-          },
-          keyframes: {
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(15px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <title>Aktivasi Akun | Portal Mitra - SIMITRADUDIKA</title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi & Transisi -->
   <style>
     .transition-smooth { transition: all 0.2s ease-in-out; }
+    
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-sans text-slate-900">
+
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-sans text-slate-900 antialiased selection:bg-primary-100 selection:text-primary-700">
   
   <!-- Decorative Background Blob (Memberi kesan premium) -->
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
-  <div class="bg-white w-full max-w-md p-8 md:p-10 rounded-2xl shadow-xl border border-slate-200/60 animate-fade-in-up">
+  <div class="bg-white w-full max-w-md p-8 md:p-10 rounded-2xl shadow-xl border border-slate-200/60 animate-fade-in-up relative z-10">
     
     <!-- Header Section -->
     <div class="text-center mb-8">
-      <div class="bg-indigo-50 text-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-indigo-100">
+      <div class="bg-primary-50 text-primary-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-primary-100">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
       <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Aktivasi Akun</h1>
       <p class="text-slate-600 mt-3 text-sm leading-relaxed">
-        Halo, <span class="font-semibold text-indigo-600"><%= typeof mitraName !== 'undefined' && mitraName ? mitraName : 'Mitra' %></span>! <br>
+        Halo, <span class="font-semibold text-primary-600"><%= typeof mitraName !== 'undefined' && mitraName ? mitraName : 'Mitra' %></span>! <br>
         Demi keamanan, silakan ganti password sementara Anda dengan password baru yang kuat.
       </p>
     </div>
 
     <!-- Error Handling (Lebih rapi dan deskriptif) -->
-    <% if (locals.error) { %>
+    <% if (typeof locals !== 'undefined' && locals.error) { %>
       <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm animate-fade-in-up">
-        <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500"></i>
+        <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
         <div>
           <p class="font-semibold mb-0.5">Gagal Mengaktivasi</p>
           <% if (error === 'password_too_short') { %> 
@@ -57,7 +53,7 @@
           <% } else if (error === 'password_mismatch') { %> 
             <p>Konfirmasi password tidak cocok dengan password baru.</p>
           <% } else { %> 
-            <p>Terjadi kesalahan pada sistem. Silakan coba lagi.</p>
+            <p><%= error %></p>
           <% } %>
         </div>
       </div>
@@ -72,9 +68,10 @@
         <div class="relative">
           <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
           <input type="password" name="new_password" id="new_password" required minlength="8"
-            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth text-sm"
-            placeholder="Minimal 8 karakter">
-          <button type="button" onclick="togglePassword('new_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1">
+            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth text-sm placeholder:text-slate-400"
+            placeholder="Minimal 8 karakter"
+            autocomplete="new-password">
+          <button type="button" onclick="togglePassword('new_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1" aria-label="Tampilkan password">
             <i data-lucide="eye" class="w-4 h-4 icon-eye-open"></i>
             <i data-lucide="eye-off" class="w-4 h-4 icon-eye-closed hidden"></i>
           </button>
@@ -87,9 +84,10 @@
         <div class="relative">
           <i data-lucide="lock-keyhole" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
           <input type="password" name="confirm_password" id="confirm_password" required minlength="8"
-            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth text-sm"
-            placeholder="Ulangi password baru">
-          <button type="button" onclick="togglePassword('confirm_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1">
+            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth text-sm placeholder:text-slate-400"
+            placeholder="Ulangi password baru"
+            autocomplete="new-password">
+          <button type="button" onclick="togglePassword('confirm_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1" aria-label="Tampilkan password">
             <i data-lucide="eye" class="w-4 h-4 icon-eye-open"></i>
             <i data-lucide="eye-off" class="w-4 h-4 icon-eye-closed hidden"></i>
           </button>
@@ -101,9 +99,11 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition-smooth shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm mt-2">
+      <button type="submit" id="submitBtn" class="w-full bg-primary-600 text-white font-semibold py-3 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm mt-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0">
         <span id="btnText">Aktivasi Akun</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <i data-lucide="arrow-right" id="btnIcon" class="w-4 h-4"></i>
+        <!-- Optional Spinner (jika ingin ditambahkan nanti) -->
+        <!-- <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">...</svg> -->
       </button>
     </form>
 
@@ -118,7 +118,9 @@
 
   <script>
     // Inisialisasi Icon
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
 
     // 1. Fungsi Toggle Password Visibility
     function togglePassword(inputId, button) {
@@ -135,6 +137,10 @@
         iconOpen.classList.remove('hidden');
         iconClosed.classList.add('hidden');
       }
+      // Re-render icons setelah perubahan DOM
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
     }
 
     // 2. Real-time Password Matching Validation (Mencegah submit sia-sia ke server)
@@ -148,11 +154,11 @@
         if (newPass.value !== confirmPass.value) {
           matchError.classList.remove('hidden');
           confirmPass.classList.add('border-red-300', 'bg-red-50', 'focus:ring-red-500/20', 'focus:border-red-500');
-          confirmPass.classList.remove('border-slate-300', 'bg-slate-50', 'focus:ring-indigo-500/20', 'focus:border-indigo-500');
+          confirmPass.classList.remove('border-slate-300', 'bg-slate-50', 'focus:ring-primary-500/20', 'focus:border-primary-500');
         } else {
           matchError.classList.add('hidden');
           confirmPass.classList.remove('border-red-300', 'bg-red-50', 'focus:ring-red-500/20', 'focus:border-red-500');
-          confirmPass.classList.add('border-slate-300', 'bg-slate-50', 'focus:ring-indigo-500/20', 'focus:border-indigo-500');
+          confirmPass.classList.add('border-slate-300', 'bg-slate-50', 'focus:ring-primary-500/20', 'focus:border-primary-500');
         }
       }
     }
@@ -162,12 +168,17 @@
 
     // 3. Intercept Submit jika masih tidak cocok
     form.addEventListener('submit', function(e) {
-      if (newPass.value !== confirmPass.value) {
+      if (newPass.value !== confirmPass.value || newPass.value.length < 8) {
         e.preventDefault();
         matchError.classList.remove('hidden');
         confirmPass.focus();
+        
+        // Opsional: Tambahkan alert atau shake animation di sini jika diinginkan
       }
     });
   </script>
+
+  <!-- Global Script (jika ada fungsi reusable) -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

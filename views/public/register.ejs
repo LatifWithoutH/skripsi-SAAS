@@ -1,39 +1,55 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Institusi | SIMITRADUDIKA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi & Transisi -->
   <style>
-    /* Transisi halus untuk semua elemen interaktif */
     .transition-smooth { transition: all 0.2s ease-in-out; }
-    
-    /* Checklist password */
     .checklist-item { transition: all 0.3s ease; }
     .checklist-item.valid { color: #059669; } /* emerald-600 */
     
-    /* Subtle fade in untuk success state */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8 font-sans text-slate-900">
 
-  <div class="bg-white w-full max-w-5xl rounded-2xl shadow-xl border border-slate-200 flex overflow-hidden">
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8 font-sans text-slate-900 antialiased selection:bg-primary-100 selection:text-primary-700 relative overflow-hidden">
 
-    <!-- LEFT PANEL: Value Proposition (Clean & Trustworthy) -->
+  <!-- Decorative Background Blobs (Global) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Main Card Container -->
+  <div class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl border border-slate-200/60 flex overflow-hidden animate-fade-in-up">
+
+    <!-- LEFT PANEL: Value Proposition -->
     <div class="hidden lg:flex w-2/5 bg-slate-900 p-10 flex-col justify-between text-white relative">
-      <!-- Subtle accent -->
-      <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+      <!-- Localized Blob for Left Panel -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
 
       <div class="relative z-10">
         <div class="flex items-center gap-3 mb-10">
-          <div class="bg-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <div class="bg-primary-600 w-10 h-10 rounded-lg flex items-center justify-center shadow-lg shadow-primary-500/30">
             <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
           </div>
           <div>
@@ -49,14 +65,18 @@
 
         <div class="space-y-4">
           <div class="flex items-start gap-3">
-            <div class="bg-slate-800 p-2 rounded-lg"><i data-lucide="database" class="w-4 h-4 text-indigo-400"></i></div>
+            <div class="bg-slate-800 p-2 rounded-lg">
+              <i data-lucide="database" class="w-4 h-4 text-primary-400"></i>
+            </div>
             <div>
               <p class="text-sm font-semibold text-slate-200">Shared Schema Isolation</p>
               <p class="text-xs text-slate-500">Data setiap institusi terjamin privasinya.</p>
             </div>
           </div>
           <div class="flex items-start gap-3">
-            <div class="bg-slate-800 p-2 rounded-lg"><i data-lucide="file-check" class="w-4 h-4 text-indigo-400"></i></div>
+            <div class="bg-slate-800 p-2 rounded-lg">
+              <i data-lucide="file-check" class="w-4 h-4 text-primary-400"></i>
+            </div>
             <div>
               <p class="text-sm font-semibold text-slate-200">Audit Log Forensik</p>
               <p class="text-xs text-slate-500">Jejak aktivitas tercatat untuk kepatuhan.</p>
@@ -83,7 +103,7 @@
           <p class="text-sm text-slate-600 max-w-sm mb-8 leading-relaxed">
             Data institusi Anda sedang dalam proses verifikasi. Anda akan menerima email aktivasi dalam 1x24 jam.
           </p>
-          <a href="/login" class="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-smooth font-medium text-sm">
+          <a href="/login" class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-smooth font-medium text-sm shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5">
             <i data-lucide="log-in" class="w-4 h-4"></i> Kembali ke Login
           </a>
         </div>
@@ -98,8 +118,8 @@
 
         <!-- ERROR MESSAGE -->
         <% if (locals.error) { %>
-        <div class="mb-6 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-lg text-sm flex items-start gap-3">
-          <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500"></i>
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-3 animate-fade-in">
+          <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
           <div>
             <p class="font-semibold mb-0.5">Registrasi Gagal</p>
             <% if (error === 'password_mismatch') { %> Konfirmasi password tidak cocok.
@@ -107,6 +127,9 @@
             <% } else if (error === 'email_exists') { %> Email ini sudah terdaftar di sistem.
             <% } else if (error === 'weak_password') { %> Password tidak memenuhi standar keamanan.
             <% } else if (error === 'tenant_exists') { %> Nama institusi ini sudah terdaftar.
+            <% } else if (error === 'invalid_slug') { %> Format subdomain tidak valid (hanya huruf kecil, angka, dan strip).
+            <% } else if (error === 'reserved_slug') { %> Subdomain ini dicadangkan oleh sistem.
+            <% } else if (error === 'slug_exists') { %> Subdomain ini sudah digunakan institusi lain.
             <% } else { %> Terjadi kesalahan pada server. Silakan coba lagi.
             <% } %>
           </div>
@@ -116,29 +139,56 @@
         <!-- FORM -->
         <form action="/register" method="POST" class="space-y-5 flex-1 flex flex-col" id="registerForm" novalidate>
 
+          <!-- Nama Institusi -->
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Institusi <span class="text-red-500">*</span></label>
             <div class="relative">
-              <i data-lucide="building-2" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-              <input type="text" name="tenant_name" required class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth" placeholder="Contoh: Universitas Nusantara">
+              <i data-lucide="building-2" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+              <input type="text" name="tenant_name" id="tenant_name" required class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" placeholder="Contoh: Universitas Islam Indonesia">
             </div>
           </div>
 
+          <!-- Subdomain / Slug -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Subdomain Institusi <span class="text-red-500">*</span></label>
+            <div class="relative flex items-center">
+              <i data-lucide="globe" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+              <input 
+                type="text" 
+                name="slug" 
+                id="slug" 
+                required 
+                pattern="^[a-z0-9-]{3,30}$"
+                title="Hanya huruf kecil, angka, dan strip (-), minimal 3 karakter"
+                class="w-full pl-10 pr-28 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" 
+                placeholder="uii"
+              >
+              <span class="absolute right-3 text-sm text-slate-400 pointer-events-none font-medium">.saas.local</span>
+            </div>
+            <!-- Indikator Status Slug -->
+            <div id="slug-status" class="mt-1.5 text-xs flex items-center gap-1.5 hidden">
+              <!-- Diisi oleh JavaScript -->
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">URL login Anda akan menjadi: <span id="slug-preview" class="font-mono text-primary-600 font-semibold bg-primary-50 px-1.5 py-0.5 rounded">uii.saas.local</span></p>
+          </div>
+
+          <!-- Email -->
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Pengelola Utama <span class="text-red-500">*</span></label>
             <div class="relative">
-              <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-              <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth" placeholder="admin@kampus.ac.id">
+              <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+              <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" placeholder="admin@kampus.ac.id">
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Password & Confirm Password Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Password -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password <span class="text-red-500">*</span></label>
               <div class="relative">
-                <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                <input type="password" name="password" id="password" required minlength="12" class="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth" placeholder="Min. 12 karakter">
+                <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="password" name="password" id="password" required minlength="12" class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" placeholder="Min. 12 karakter">
                 <button type="button" onclick="togglePassword('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1">
                   <i data-lucide="eye" class="w-4 h-4 icon-eye-open"></i>
                   <i data-lucide="eye-off" class="w-4 h-4 icon-eye-closed hidden"></i>
@@ -148,23 +198,23 @@
               <!-- Compact Password Checklist -->
               <div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2" id="password-requirements">
                 <div class="checklist-item flex items-center gap-2 text-slate-500 text-xs" id="req-length">
-                  <i data-lucide="circle" class="w-3 h-3 icon-empty flex-shrink-0"></i>
-                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
+                  <i data-lucide="circle" class="w-3.5 h-3.5 icon-empty flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
                   <span>Min. 12 karakter</span>
                 </div>
                 <div class="checklist-item flex items-center gap-2 text-slate-500 text-xs" id="req-upper">
-                  <i data-lucide="circle" class="w-3 h-3 icon-empty flex-shrink-0"></i>
-                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
+                  <i data-lucide="circle" class="w-3.5 h-3.5 icon-empty flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
                   <span>1 Huruf besar</span>
                 </div>
                 <div class="checklist-item flex items-center gap-2 text-slate-500 text-xs" id="req-number">
-                  <i data-lucide="circle" class="w-3 h-3 icon-empty flex-shrink-0"></i>
-                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
+                  <i data-lucide="circle" class="w-3.5 h-3.5 icon-empty flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
                   <span>1 Angka</span>
                 </div>
                 <div class="checklist-item flex items-center gap-2 text-slate-500 text-xs" id="req-symbol">
-                  <i data-lucide="circle" class="w-3 h-3 icon-empty flex-shrink-0"></i>
-                  <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
+                  <i data-lucide="circle" class="w-3.5 h-3.5 icon-empty flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 icon-filled hidden flex-shrink-0"></i>
                   <span>1 Simbol (@$!%)</span>
                 </div>
               </div>
@@ -174,8 +224,8 @@
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-1.5">Konfirmasi Password <span class="text-red-500">*</span></label>
               <div class="relative">
-                <i data-lucide="lock-keyhole" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                <input type="password" name="confirm_password" id="confirm_password" required minlength="12" class="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-smooth" placeholder="Ulangi password">
+                <i data-lucide="lock-keyhole" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <input type="password" name="confirm_password" id="confirm_password" required minlength="12" class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth placeholder:text-slate-400" placeholder="Ulangi password">
                 <button type="button" onclick="togglePassword('confirm_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-smooth p-1">
                   <i data-lucide="eye" class="w-4 h-4 icon-eye-open"></i>
                   <i data-lucide="eye-off" class="w-4 h-4 icon-eye-closed hidden"></i>
@@ -187,23 +237,26 @@
             </div>
           </div>
 
+          <!-- Terms Checkbox -->
           <div class="flex items-start gap-3 pt-2">
-            <input type="checkbox" name="agree_terms" id="agree_terms" required class="mt-1 w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500/20 focus:ring-2 cursor-pointer">
+            <input type="checkbox" name="agree_terms" id="agree_terms" required class="mt-1 w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500/20 focus:ring-2 cursor-pointer">
             <label for="agree_terms" class="text-xs text-slate-600 leading-relaxed cursor-pointer">
-              Saya setuju dengan <a href="#" class="text-indigo-600 hover:text-indigo-700 font-semibold underline decoration-indigo-600/30 underline-offset-2">Syarat & Ketentuan</a> serta <a href="#" class="text-indigo-600 hover:text-indigo-700 font-semibold underline decoration-indigo-600/30 underline-offset-2">Kebijakan Privasi</a> SIMITRADUDIKA.
+              Saya setuju dengan <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold underline decoration-primary-600/30 underline-offset-2">Syarat & Ketentuan</a> serta <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold underline decoration-primary-600/30 underline-offset-2">Kebijakan Privasi</a> SIMITRADUDIKA.
             </label>
           </div>
 
+          <!-- Submit Button -->
           <div class="mt-auto pt-4">
-            <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-smooth shadow-sm shadow-indigo-200 flex items-center justify-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed transform active:scale-[0.99]">
+            <button type="submit" id="submitBtn" class="w-full bg-primary-600 text-white font-semibold py-3 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0">
               <span id="btnText">Buat Akun & Mulai Uji Coba</span>
+              <i data-lucide="arrow-right" id="btnIcon" class="w-4 h-4"></i>
               <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </button>
             <p class="text-center text-xs text-slate-500 mt-4">
-              Sudah punya akun? <a href="/login" class="text-indigo-600 font-semibold hover:text-indigo-700">Masuk di sini</a>
+              Sudah punya akun? <a href="/login" class="text-primary-600 font-semibold hover:text-primary-700 hover:underline transition-colors">Masuk di sini</a>
             </p>
           </div>
 
@@ -213,6 +266,7 @@
   </div>
 
   <script>
+    // Inisialisasi awal
     lucide.createIcons();
 
     const passwordInput = document.getElementById('password');
@@ -223,6 +277,89 @@
     const hasUpper = /[A-Z]/;
     const hasNumber = /\d/;
     const hasSymbol = /[@$!%*?&]/;
+
+    // ==========================================
+    // LOGIKA: SLUG CHECKER REAL-TIME
+    // ==========================================
+    const slugInput = document.getElementById('slug');
+    const slugStatus = document.getElementById('slug-status');
+    const slugPreview = document.getElementById('slug-preview');
+    const tenantNameInput = document.getElementById('tenant_name');
+    let slugCheckTimeout;
+
+    // 1. Auto-suggest slug saat user mengetik Nama Institusi
+    tenantNameInput.addEventListener('input', function() {
+      if (!slugInput.dataset.manuallyEdited) {
+        const suggested = this.value
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '') 
+          .trim()
+          .replace(/\s+/g, '-');       
+        
+        slugInput.value = suggested;
+        updateSlugPreview();
+        if (suggested.length >= 3) {
+          checkSlugAvailability(suggested);
+        }
+      }
+    });
+
+    // 2. Tandai jika user mengedit slug secara manual
+    slugInput.addEventListener('input', function() {
+      this.dataset.manuallyEdited = "true";
+      updateSlugPreview();
+      
+      clearTimeout(slugCheckTimeout);
+      const currentSlug = this.value;
+      
+      if (currentSlug.length < 3) {
+        hideSlugStatus();
+        return;
+      }
+
+      // Debounce agar tidak spam request ke server
+      slugCheckTimeout = setTimeout(() => {
+        checkSlugAvailability(currentSlug);
+      }, 500);
+    });
+
+    function updateSlugPreview() {
+      const val = slugInput.value || 'subdomain';
+      slugPreview.textContent = `${val}.saas.local`;
+    }
+
+    function checkSlugAvailability(slug) {
+      slugStatus.classList.remove('hidden');
+      slugStatus.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-slate-400"></i> <span class="text-slate-500">Mengecek ketersediaan...</span>`;
+      lucide.createIcons();
+
+      fetch(`/api/check-slug?slug=${encodeURIComponent(slug)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.available) {
+            slugStatus.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> <span class="text-emerald-600 font-medium">${data.message}</span>`;
+            slugInput.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500/20');
+            slugInput.classList.add('border-emerald-300', 'focus:border-emerald-500', 'focus:ring-emerald-500/20');
+          } else {
+            slugStatus.innerHTML = `<i data-lucide="x-circle" class="w-3.5 h-3.5 text-red-600"></i> <span class="text-red-600 font-medium">${data.message}</span>`;
+            slugInput.classList.remove('border-emerald-300', 'focus:border-emerald-500', 'focus:ring-emerald-500/20');
+            slugInput.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500/20');
+          }
+          lucide.createIcons();
+        })
+        .catch(err => {
+          console.error('Slug check failed', err);
+          hideSlugStatus();
+        });
+    }
+
+    function hideSlugStatus() {
+      slugStatus.classList.add('hidden');
+      slugInput.classList.remove('border-emerald-300', 'focus:border-emerald-500', 'focus:ring-emerald-500/20', 'border-red-300', 'focus:border-red-500', 'focus:ring-red-500/20');
+    }
+    // ==========================================
+    // AKHIR LOGIKA SLUG
+    // ==========================================
 
     function togglePassword(inputId, button) {
       const input = document.getElementById(inputId);
@@ -238,6 +375,7 @@
         iconOpen.classList.remove('hidden');
         iconClosed.classList.add('hidden');
       }
+      lucide.createIcons(); // Re-render icons after toggle
     }
 
     function updatePasswordRequirements() {
@@ -263,6 +401,7 @@
         emptyIcon.classList.remove('hidden');
         filledIcon.classList.add('hidden');
       }
+      lucide.createIcons();
     }
 
     function checkPasswordMatch() {
@@ -270,11 +409,11 @@
         if (passwordInput.value !== confirmInput.value) {
           matchError.classList.remove('hidden');
           confirmInput.classList.add('border-red-300', 'bg-red-50', 'focus:ring-red-500/20', 'focus:border-red-500');
-          confirmInput.classList.remove('border-slate-200', 'bg-slate-50', 'focus:ring-indigo-500/20', 'focus:border-indigo-500');
+          confirmInput.classList.remove('border-slate-300', 'bg-slate-50', 'focus:ring-primary-500/20', 'focus:border-primary-500');
         } else {
           matchError.classList.add('hidden');
           confirmInput.classList.remove('border-red-300', 'bg-red-50', 'focus:ring-red-500/20', 'focus:border-red-500');
-          confirmInput.classList.add('border-slate-200', 'bg-slate-50', 'focus:ring-indigo-500/20', 'focus:border-indigo-500');
+          confirmInput.classList.add('border-slate-300', 'bg-slate-50', 'focus:ring-primary-500/20', 'focus:border-primary-500');
         }
       }
     }
@@ -283,6 +422,7 @@
     confirmInput.addEventListener('input', checkPasswordMatch);
 
     form.addEventListener('submit', function(e) {
+      // 1. Validasi Password
       const val = passwordInput.value;
       const isLengthValid = val.length >= 12;
       const isUpperValid = hasUpper.test(val);
@@ -293,7 +433,6 @@
 
       if (!isLengthValid || !isUpperValid || !isNumberValid || !isSymbolValid) {
         e.preventDefault();
-        // Optional: Ganti alert dengan toast notification yang lebih elegan nanti
         alert('Mohon lengkapi semua syarat password.');
         return;
       }
@@ -311,14 +450,28 @@
         return;
       }
 
+      // 2. VALIDASI: Cek apakah slug valid sebelum submit
+      if (slugInput.classList.contains('border-red-300') || slugInput.value.length < 3) {
+        e.preventDefault();
+        alert('Subdomain tidak valid atau sudah digunakan. Silakan pilih subdomain lain.');
+        slugInput.focus();
+        return;
+      }
+
+      // 3. Animasi Loading Submit
       const submitBtn = document.getElementById('submitBtn');
       const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
       const btnSpinner = document.getElementById('btnSpinner');
       
       submitBtn.disabled = true;
       btnText.textContent = 'Memproses...';
+      btnIcon.classList.add('hidden');
       btnSpinner.classList.remove('hidden');
     });
   </script>
+
+  <!-- Global Script (jika ada fungsi reusable) -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

@@ -1,20 +1,27 @@
 {
   "name": "skripsi-saas",
   "version": "1.0.0",
-  "description": "Multi-tenant SaaS Application for Skripsi",
+  "description": "Multi-tenant SaaS Application for Skripsi with OWASP Security Focus",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "build:css": "tailwindcss -i ./public/css/tailwind.css -o ./public/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./public/css/tailwind.css -o ./public/css/output.css --watch",
+    "docker:dev": "npm run watch:css & nodemon app.js"
   },
   "keywords": [
     "saas",
     "multi-tenant",
     "express",
-    "postgresql"
+    "postgresql",
+    "owasp"
   ],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.6.1",
@@ -24,6 +31,7 @@
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide": "^1.68.0",
     "morgan": "^1.12.1",
     "multer": "^2.4.0",
     "nodemailer": "^10.0.13",
@@ -32,6 +40,9 @@
     "resend": "^6.32.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "autoprefixer": "^10.4.20",
+    "nodemon": "^3.0.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.19"
   }
 }

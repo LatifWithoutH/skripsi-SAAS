@@ -1,6 +1,6 @@
 const { pool } = require('../config/database');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto'); // ✅ TAMBAHAN: Modul kriptografi bawaan Node.js
+const crypto = require('crypto'); 
 const { sendInviteEmail } = require('../utils/emailService');
 
 exports.inviteUser = async (req, res) => {
@@ -9,6 +9,9 @@ exports.inviteUser = async (req, res) => {
         const tenantId = req.session.tenantId;
         const inviterId = req.session.userId;
         const inviterRole = req.session.role;
+        
+        // ✅ AMBIL SLUG DARI TENANT RESOLVER (Fallback ke session jika ada edge case)
+        const tenantSlug = req.tenant ? req.tenant.slug : (req.session.tenantSlug || 'unknown');
 
         // 1. Validasi Role Pengundang
         if (!['tenant_owner', 'it_admin'].includes(inviterRole)) {
@@ -43,7 +46,6 @@ exports.inviteUser = async (req, res) => {
                 } 
                 if (user.status === 'pending_invite') {
                     // RESEND INVITE
-                    // ✅ PERBAIKAN: 12 bytes = 96 bit entropy, base64url aman untuk email/URL (tanpa karakter + atau /)
                     const newTempPassword = crypto.randomBytes(12).toString('base64url');
                     const newHash = await bcrypt.hash(newTempPassword, 10);
                     
@@ -57,7 +59,9 @@ exports.inviteUser = async (req, res) => {
                         if (unitData.rows.length > 0) unitName = unitData.rows[0].name;
                     }
                     
-                    await sendInviteEmail(email, newTempPassword, unitName, roleName);
+                    // ✅ PERBAIKAN: Tambahkan tenantSlug sebagai parameter ke-5
+                    await sendInviteEmail(email, newTempPassword, unitName, roleName, tenantSlug);
+                    
                     await pool.query(`INSERT INTO audit_logs (tenant_id, user_id, action, target_table, target_id, details, ip_address) VALUES ($1, $2, 'RESEND_INVITE', 'users', $3, $4, $5)`, 
                         [tenantId, inviterId, user.id, JSON.stringify({ email }), req.ip]);
                     
@@ -69,7 +73,6 @@ exports.inviteUser = async (req, res) => {
         }
 
         // 5. User benar-benar baru (Normal Flow)
-        // ✅ PERBAIKAN: Menghasilkan password sementara yang cryptographically secure
         const tempPassword = crypto.randomBytes(12).toString('base64url');
         const passwordHash = await bcrypt.hash(tempPassword, 10);
         const name = email.split('@')[0].replace(/[._-]/g, ' ');
@@ -93,7 +96,9 @@ exports.inviteUser = async (req, res) => {
             if (unitData.rows.length > 0) unitName = unitData.rows[0].name;
         }
         
-        const emailSent = await sendInviteEmail(email, tempPassword, unitName, roleName);
+        // ✅ PERBAIKAN: Tambahkan tenantSlug sebagai parameter ke-5
+        const emailSent = await sendInviteEmail(email, tempPassword, unitName, roleName, tenantSlug);
+        
         if (emailSent) {
             return res.redirect(`/dashboard?success=true&email=${encodeURIComponent(email)}`);
         } else {

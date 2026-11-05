@@ -1,42 +1,18 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIMITRADUDIKA | Platform SaaS Multi-Tenant</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-10px)' },
-            },
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style yang tidak bisa di-compile Tailwind (opsional, biarkan saja) -->
   <style>
     .glass-nav {
       background: rgba(255, 255, 255, 0.85);
@@ -50,6 +26,7 @@
     }
   </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-primary-100 selection:text-primary-700">
   
   <!-- Navbar (Sticky & Glassmorphism) -->
@@ -178,8 +155,9 @@
     </div>
   </footer>
 
-  <script>
-    lucide.createIcons();
-  </script>
+  <!-- ... kode HTML lainnya ... -->
+
+  <!-- Panggil file script.js eksternal kita -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

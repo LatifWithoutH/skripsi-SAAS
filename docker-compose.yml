@@ -1,4 +1,4 @@
-# Hapus baris "version: '3.8'" agar warning hilang (standar Docker Compose V2)
+# Standar Docker Compose V2 (baris "version" dihapus)
 
 services:
   # 1. Lapisan Database (PostgreSQL)
@@ -12,16 +12,15 @@ services:
       TZ: Asia/Jakarta
     volumes:
       - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres_data:/var/lib/postgresql/data  # ✅ Persisten data database
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - internal_network
-    # ✅ TAMBAHAN PENTING: Healthcheck agar Node.js menunggu DB benar-benar siap
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U skripsi_user -d saas_skripsi_db"]
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
+    restart: unless-stopped
 
   # 2. Lapisan Aplikasi (Node.js)
   app:
@@ -29,48 +28,63 @@ services:
     ports:
       - "3000:3000"
     container_name: saas_app
-    # ✅ TAMBAHAN PENTING: Baca otomatis dari file .env Anda (lebih rapi & anti typo)
     env_file:
       - .env
-    # ✅ TAMBAHAN PENTING: Tunggu healthcheck DB berhasil sebelum start
     depends_on:
       db:
         condition: service_healthy
     networks:
       - internal_network
-    # ✅ BIND MOUNT: Sync folder host → container (untuk development)
     volumes:
-      - .:/app                    # Sync seluruh folder proyek ke container
-      - /app/node_modules         # Kecuali node_modules (pakai yang di container)
-      - /app/public/uploads       # Kecuali uploads (biar persisten)
-    # ✅ Healthcheck untuk monitoring
+      - .:/app
+      - /app/node_modules
+      - /app/public/uploads
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
+    restart: unless-stopped
 
-  # 3. Lapisan Jaringan / Reverse Proxy (Nginx)
+  # 3. ✅ Lapisan Asset Builder (Tailwind CSS Watcher)
+  css-watcher:
+    build: .
+    container_name: saas_css_watcher
+    # ✅ PAKAI INI: Lebih stabil daripada npx karena memakai node_modules lokal
+    command: npm run watch:css
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - internal_network
+    restart: unless-stopped
+    tty: true            # ✅ Wajib agar proses watch tetap hidup
+    stdin_open: true     # ✅ Wajib agar proses watch tetap hidup
+
+  # 4. Lapisan Jaringan / Reverse Proxy (Nginx)
+
   proxy:
     image: nginx:alpine
     container_name: saas_proxy
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/usr/share/nginx/html/public # Mount untuk direct serve
+      # ✅ TAMBAHKAN INI UNTUK MKCERT
+      - ./_wildcard.saas.local+4.pem:/etc/nginx/certs/wildcard.pem:ro
+      - ./_wildcard.saas.local+4-key.pem:/etc/nginx/certs/wildcard-key.pem:ro
     depends_on:
       - app
     networks:
       - internal_network
-    restart: unless-stopped  # ✅ Auto-restart kalau crash/laptop reboot
+    restart: unless-stopped
 
-# ✅ Definisi Jaringan Virtual Terisolasi
 networks:
   internal_network:
     driver: bridge
 
-# ✅ Definisi Volume Persisten
 volumes:
-  postgres_data:  # ✅ Data database tidak hilang saat container di-recreate
+  postgres_data:

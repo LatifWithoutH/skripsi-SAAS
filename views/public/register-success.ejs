@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pendaftaran Berhasil | SIMITRADUDIKA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi -->
   <style>
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
@@ -13,64 +19,101 @@
     }
     .animate-float { animation: float 4s ease-in-out infinite; }
     
-    @keyframes scale-in {
-      0% { transform: scale(0.8); opacity: 0; }
+    @keyframes scaleIn {
+      0% { transform: scale(0.9); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-    .animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-  <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-gray-200 p-8 md:p-12 text-center animate-scale-in">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-primary-100 selection:text-primary-700 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+  <!-- Decorative Background Blobs -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Main Success Card -->
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200/60 p-8 md:p-12 text-center animate-scale-in relative z-10">
     
-    <!-- Icon Animasi -->
-    <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-100 animate-float">
-      <i data-lucide="shield-check" class="w-12 h-12 text-emerald-600"></i>
+    <!-- Animated Icon -->
+    <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20 animate-float">
+      <i data-lucide="shield-check" class="w-10 h-10 text-emerald-600"></i>
     </div>
 
-    <!-- Judul & Pesan -->
-    <h1 class="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Pendaftaran Berhasil!</h1>
+    <!-- Title & Message -->
+    <h1 class="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Pendaftaran Berhasil!</h1>
     
-    <p class="text-gray-600 mb-6 leading-relaxed">
-      Terima kasih telah mendaftar di <span class="font-semibold text-indigo-600">SIMITRADUDIKA</span>. 
+    <p class="text-slate-600 mb-8 leading-relaxed">
+      Terima kasih telah mendaftar di <span class="font-semibold text-primary-600">SIMITRADUDIKA</span>. 
       Data institusi Anda saat ini sedang dalam proses <strong>review keamanan</strong> oleh tim admin kami.
     </p>
 
-    <!-- Info Box -->
-    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-8 text-left">
+    <!-- ✅ EJS Logic: Info Box Dinamis untuk Slug -->
+    <% if (locals.slug) { %>
+    <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-8 text-left">
       <div class="flex gap-3">
-        <i data-lucide="info" class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5"></i>
-        <div class="text-sm text-indigo-800 space-y-2">
-          <p>⏱️ <strong>Estimasi Waktu:</strong> Maksimal 1x24 jam kerja.</p>
-          <p>📧 <strong>Notifikasi:</strong> Kami akan mengirimkan email ke alamat yang Anda daftarkan segera setelah akun diaktifkan.</p>
+        <i data-lucide="link" class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5"></i>
+        <div class="text-sm text-primary-800 space-y-2 w-full">
+          <p class="font-semibold">URL Login Institusi Anda:</p>
+          <div class="font-mono bg-white border border-primary-200 px-3 py-2.5 rounded-lg text-primary-700 font-bold text-center tracking-wide break-all">
+            https://<%= slug %>.saas.local/login
+          </div>
+          <p class="text-xs text-primary-600 mt-2 flex items-start gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Penting:</strong> Simpan link ini! Anda akan membutuhkannya untuk login setelah akun disetujui.</span>
+          </p>
         </div>
       </div>
     </div>
+    <% } else { %>
+    <!-- Fallback jika slug tidak tersedia -->
+    <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-8 text-left">
+      <div class="flex gap-3">
+        <i data-lucide="info" class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5"></i>
+        <div class="text-sm text-primary-800 space-y-2">
+          <p class="flex items-center gap-2">
+            <span class="text-lg">⏱️</span> 
+            <span><strong>Estimasi Waktu:</strong> Maksimal 1x24 jam kerja.</span>
+          </p>
+          <p class="flex items-center gap-2">
+            <span class="text-lg">📧</span> 
+            <span><strong>Notifikasi:</strong> Kami akan mengirimkan email berisi link login segera setelah akun diaktifkan.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <% } %>
 
     <!-- Action Buttons -->
     <div class="space-y-3">
-      <a href="/" class="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-semibold shadow-lg shadow-indigo-200 transform active:scale-[0.98]">
+      <a href="/" class="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all font-semibold shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0">
         <i data-lucide="home" class="w-4 h-4"></i>
         Kembali ke Beranda
       </a>
       
-      <a href="/login" class="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-white text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold">
+      <a href="/login" class="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-white text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-semibold">
         <i data-lucide="log-in" class="w-4 h-4"></i>
         Ke Halaman Login
       </a>
     </div>
 
     <!-- Footer Note -->
-    <p class="text-xs text-gray-400 mt-8">
-      Butuh bantuan segera? Hubungi tim support kami di <a href="mailto:support@simitradudika.id" class="text-indigo-600 hover:underline">support@simitradudika.id</a>
+    <p class="text-xs text-slate-400 mt-8">
+      Butuh bantuan segera? Hubungi tim support kami di 
+      <a href="mailto:support@simitradudika.id" class="text-primary-600 hover:text-primary-700 hover:underline transition-colors font-medium">support@simitradudika.id</a>
     </p>
 
   </div>
 
   <script>
-    // Inisialisasi ikon
+    // Inisialisasi ikon Lucide
     lucide.createIcons();
   </script>
+
+  <!-- Global Script (jika ada fungsi reusable) -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

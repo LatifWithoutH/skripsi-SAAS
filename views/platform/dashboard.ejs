@@ -1,52 +1,38 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SYSTEM OVERVIEW | SIMITRADUDIKA</title>
   
-  <!-- EVA-01 Tactical Fonts -->
+  <!-- 1. EVA-01 Tactical Fonts (Lokal via Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- 2. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
   
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { 
-            tech: ['"Share Tech Mono"', 'monospace'],
-            display: ['"Rajdhani"', 'sans-serif'],
-          },
-          colors: {
-            eva: {
-              dark: '#050508',
-              panel: '#0a0a12',
-              purple: '#8b5cf6',
-              green: '#4ade80',
-              orange: '#f97316',
-            }
-          },
-          animation: { 
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'blink': 'blink 1.5s step-end infinite',
-          },
-          keyframes: {
-            blink: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.3' } }
-          }
-        }
-      }
-    }
-  </script>
+  <!-- 3. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
   
+  <!-- 4. Custom Style: EVA Theme & Utilities (Garansi bekerja tanpa Tailwind Config) -->
   <style>
-    /* 🟣 NERV HEXAGONAL BACKGROUND 🟣 */
+    :root {
+      --eva-dark: #050508;
+      --eva-panel: #0a0a12;
+      --eva-purple: #8b5cf6;
+      --eva-green: #4ade80;
+      --eva-orange: #f97316;
+    }
+
+    /* Font Families */
+    .font-tech { font-family: 'Share Tech Mono', monospace; }
+    .font-display { font-family: 'Rajdhani', sans-serif; }
+
+    /* Background & Scanlines */
     body {
-      background-color: #050508;
-      /* Pola Hexagonal Seamless dengan aksen Purple EVA & Orange NERV */
+      background-color: var(--eva-dark);
       background-image: 
         radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 70%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%238b5cf6' fill-opacity='0.08'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3Cg fill='%23f97316' fill-opacity='0.04'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
@@ -54,7 +40,6 @@
       background-attachment: fixed;
     }
     
-    /* CRT Scanline Effect (Dipertahankan untuk nuansa monitor NERV) */
     .scanlines::before {
       content: " ";
       display: block;
@@ -75,18 +60,68 @@
     .text-glow-purple { text-shadow: 0 0 8px rgba(139, 92, 246, 0.6); }
     .text-glow-orange { text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
 
-    /* Custom Scrollbar */
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #0a0a12; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4ade80; border-radius: 2px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #8b5cf6; }
-
     /* Angular Clip Path for Buttons/Panels */
     .clip-mecha {
       clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
     }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: var(--eva-panel); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--eva-green); border-radius: 2px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--eva-purple); }
+
+    /* Animations */
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .animate-blink { animation: blink 1.5s step-end infinite; }
+    
+    @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .animate-pulse-slow { animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+    /* Utility Color Overrides (agar bekerja tanpa tailwind.config.js) */
+    .bg-eva-dark { background-color: var(--eva-dark); }
+    .bg-eva-panel { background-color: var(--eva-panel); }
+    .bg-eva-panel\/80 { background-color: rgba(10, 10, 18, 0.8); }
+    .bg-eva-panel\/90 { background-color: rgba(10, 10, 18, 0.9); }
+    .bg-eva-purple { background-color: var(--eva-purple); }
+    .bg-eva-purple\/5 { background-color: rgba(139, 92, 246, 0.05); }
+    .bg-eva-purple\/10 { background-color: rgba(139, 92, 246, 0.1); }
+    .bg-eva-purple\/20 { background-color: rgba(139, 92, 246, 0.2); }
+    .bg-eva-green { background-color: var(--eva-green); }
+    .bg-eva-green\/5 { background-color: rgba(74, 222, 128, 0.05); }
+    .bg-eva-green\/10 { background-color: rgba(74, 222, 128, 0.1); }
+    .bg-eva-orange { background-color: var(--eva-orange); }
+    .bg-eva-orange\/5 { background-color: rgba(249, 115, 22, 0.05); }
+    .bg-eva-orange\/10 { background-color: rgba(249, 115, 22, 0.1); }
+    .bg-eva-orange\/20 { background-color: rgba(249, 115, 22, 0.2); }
+    
+    .text-eva-purple { color: var(--eva-purple); }
+    .text-eva-green { color: var(--eva-green); }
+    .text-eva-orange { color: var(--eva-orange); }
+    
+    .border-eva-purple { border-color: var(--eva-purple); }
+    .border-eva-purple\/10 { border-color: rgba(139, 92, 246, 0.1); }
+    .border-eva-purple\/30 { border-color: rgba(139, 92, 246, 0.3); }
+    .border-eva-purple\/40 { border-color: rgba(139, 92, 246, 0.4); }
+    .border-eva-purple\/50 { border-color: rgba(139, 92, 246, 0.5); }
+    .border-eva-green { border-color: var(--eva-green); }
+    .border-eva-green\/30 { border-color: rgba(74, 222, 128, 0.3); }
+    .border-eva-green\/40 { border-color: rgba(74, 222, 128, 0.4); }
+    .border-eva-green\/50 { border-color: rgba(74, 222, 128, 0.5); }
+    .border-eva-orange { border-color: var(--eva-orange); }
+    .border-eva-orange\/30 { border-color: rgba(249, 115, 22, 0.3); }
+    .border-eva-orange\/40 { border-color: rgba(249, 115, 22, 0.4); }
+    .border-eva-orange\/50 { border-color: rgba(249, 115, 22, 0.5); }
+    
+    .hover\:bg-eva-purple\/5:hover { background-color: rgba(139, 92, 246, 0.05); }
+    .hover\:bg-eva-orange\/5:hover { background-color: rgba(249, 115, 22, 0.05); }
+    .hover\:bg-eva-orange\/20:hover { background-color: rgba(249, 115, 22, 0.2); }
+    .hover\:border-eva-purple:hover { border-color: var(--eva-purple); }
+    .hover\:border-eva-green:hover { border-color: var(--eva-green); }
+    .hover\:border-eva-orange:hover { border-color: var(--eva-orange); }
   </style>
 </head>
+
 <body class="font-tech text-eva-green antialiased selection:bg-eva-purple selection:text-white scanlines">
 
   <!-- 1. TOP NAVIGATION -->
@@ -105,11 +140,15 @@
         <div class="flex items-center gap-4">
           <div class="hidden sm:flex items-center gap-3 pr-4 border-r border-eva-purple/30">
             <div class="text-right">
-              <span class="block text-sm font-display font-bold text-white tracking-wider"><%= typeof user !== 'undefined' && user.name ? user.name : 'SUPER ADMIN' %></span>
-              <span class="block text-xs font-tech text-eva-purple"><%= typeof user !== 'undefined' && user.role ? user.role : 'PLATFORM OWNER' %></span>
+              <span class="block text-sm font-display font-bold text-white tracking-wider">
+                <%= typeof user !== 'undefined' && user ? user.name : 'SUPER ADMIN' %>
+              </span>
+              <span class="block text-xs font-tech text-eva-purple">
+                <%= typeof user !== 'undefined' && user ? user.role : 'PLATFORM OWNER' %>
+              </span>
             </div>
             <div class="w-9 h-9 rounded-none border border-eva-green bg-eva-green/10 flex items-center justify-center text-eva-green font-display font-bold text-lg glow-green">
-              <%= (typeof user !== 'undefined' && user.name ? user.name : 'S').charAt(0).toUpperCase() %>
+              <%= (typeof user !== 'undefined' && user && user.name ? user.name : 'S').charAt(0).toUpperCase() %>
             </div>
           </div>
           <form action="/platform/logout" method="POST">
@@ -132,12 +171,12 @@
     </div>
 
     <!-- Notifikasi -->
-    <% if (locals.success === 'approved') { %>
+    <% if (typeof locals !== 'undefined' && locals.success === 'approved') { %>
       <div class="mb-6 bg-eva-green/10 border border-eva-green/50 text-eva-green px-4 py-3 clip-mecha flex items-center gap-3 font-tech text-sm tracking-wider glow-green animate-blink">
         <i data-lucide="check" class="w-5 h-5 text-glow-green"></i>
         <span>> SYSTEM ALERT: TENANT BERHASIL DIAKTIFKAN. AKSES DIBERIKAN.</span>
       </div>
-    <% } else if (locals.success === 'rejected') { %>
+    <% } else if (typeof locals !== 'undefined' && locals.success === 'rejected') { %>
       <div class="mb-6 bg-eva-orange/10 border border-eva-orange/50 text-eva-orange px-4 py-3 clip-mecha flex items-center gap-3 font-tech text-sm tracking-wider glow-orange">
         <i data-lucide="x" class="w-5 h-5"></i>
         <span>> WARNING: PENDAFTARAN TENANT DITOLAK. PROSES DIHENTIKAN.</span>
@@ -153,7 +192,9 @@
           <p class="text-xs font-tech text-eva-purple tracking-[0.2em]">TENANT AKTIF</p>
           <i data-lucide="building-2" class="w-5 h-5 text-eva-purple"></i>
         </div>
-        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-purple relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.active : 0 %></p>
+        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-purple relative z-10">
+          <%= typeof tenantStats !== 'undefined' && tenantStats ? tenantStats.active : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-eva-purple/60 mt-2 tracking-widest">> INSTITUSI BERJALAN NORMAL</p>
       </div>
 
@@ -164,7 +205,9 @@
           <p class="text-xs font-tech text-eva-green tracking-[0.2em] animate-pulse">MENUNGGU APPROVAL</p>
           <i data-lucide="clock" class="w-5 h-5 text-eva-green"></i>
         </div>
-        <p class="text-4xl font-display font-bold text-eva-green tracking-tight text-glow-green relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.pending : 0 %></p>
+        <p class="text-4xl font-display font-bold text-eva-green tracking-tight text-glow-green relative z-10">
+          <%= typeof tenantStats !== 'undefined' && tenantStats ? tenantStats.pending : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-eva-green/60 mt-2 tracking-widest">> PERLU TINDAKAN SEGERA</p>
       </div>
 
@@ -175,7 +218,9 @@
           <p class="text-xs font-tech text-eva-orange tracking-[0.2em]">DITOLAK</p>
           <i data-lucide="x-circle" class="w-5 h-5 text-eva-orange"></i>
         </div>
-        <p class="text-4xl font-display font-bold text-white tracking-tight relative z-10"><%= typeof tenantStats !== 'undefined' ? tenantStats.rejected : 0 %></p>
+        <p class="text-4xl font-display font-bold text-white tracking-tight relative z-10">
+          <%= typeof tenantStats !== 'undefined' && tenantStats ? tenantStats.rejected : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-eva-orange/60 mt-2 tracking-widest">> PENDAFTARAN TIDAK DISYAHKAN</p>
       </div>
     </div>
@@ -187,7 +232,9 @@
           <p class="text-xs font-tech text-slate-400 tracking-[0.2em]">TOTAL PENGGUNA AKTIF</p>
           <i data-lucide="users" class="w-5 h-5 text-eva-purple"></i>
         </div>
-        <p class="text-3xl font-display font-bold text-white tracking-tight"><%= typeof globalStats !== 'undefined' ? globalStats.total_active_users : 0 %></p>
+        <p class="text-3xl font-display font-bold text-white tracking-tight">
+          <%= typeof globalStats !== 'undefined' && globalStats ? globalStats.total_active_users : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-slate-500 mt-2 tracking-widest">> STAF & OPERATOR DI SELURUH KAMPUS</p>
       </div>
 
@@ -196,7 +243,9 @@
           <p class="text-xs font-tech text-slate-400 tracking-[0.2em]">TOTAL MITRA TERDAFTAR</p>
           <i data-lucide="briefcase" class="w-5 h-5 text-eva-green"></i>
         </div>
-        <p class="text-3xl font-display font-bold text-white tracking-tight"><%= typeof globalStats !== 'undefined' ? globalStats.total_active_mitra : 0 %></p>
+        <p class="text-3xl font-display font-bold text-white tracking-tight">
+          <%= typeof globalStats !== 'undefined' && globalStats ? globalStats.total_active_mitra : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-slate-500 mt-2 tracking-widest">> PERUSAHAAN DI SELURUH PLATFORM</p>
       </div>
 
@@ -207,9 +256,11 @@
           <p class="text-xs font-tech text-eva-orange tracking-[0.2em] animate-pulse">INSIDEN KEAMANAN (24H)</p>
           <i data-lucide="shield-alert" class="w-5 h-5 text-eva-orange"></i>
         </div>
-        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-orange relative z-10"><%= typeof securityMetrics !== 'undefined' ? securityMetrics.totalIncidents : 0 %></p>
+        <p class="text-4xl font-display font-bold text-white tracking-tight text-glow-orange relative z-10">
+          <%= typeof securityMetrics !== 'undefined' && securityMetrics ? securityMetrics.totalIncidents : 0 %>
+        </p>
         <p class="text-[10px] font-tech text-eva-orange/70 mt-2 tracking-widest relative z-10">
-          > <%= typeof securityMetrics !== 'undefined' && securityMetrics.suspiciousIPsCount > 0 ? securityMetrics.suspiciousIPsCount + ' IP MENCURIGAKAN TERDETEKSI' : 'SISTEM RELATIF AMAN' %>
+          > <%= typeof securityMetrics !== 'undefined' && securityMetrics && securityMetrics.suspiciousIPsCount > 0 ? securityMetrics.suspiciousIPsCount + ' IP MENCURIGAKAN TERDETEKSI' : 'SISTEM RELATIF AMAN' %>
         </p>
       </div>
     </div>
@@ -225,11 +276,11 @@
             <h3 class="font-display font-bold text-white text-sm tracking-[0.15em]">ANTRIAN ONBOARDING TENANT</h3>
           </div>
           <span class="text-xs font-tech text-eva-green bg-eva-green/10 border border-eva-green/30 px-3 py-1 tracking-widest">
-            <%= typeof pendingTenants !== 'undefined' ? pendingTenants.length : 0 %> ITEM
+            <%= typeof pendingTenants !== 'undefined' && pendingTenants ? pendingTenants.length : 0 %> ITEM
           </span>
         </div>
         
-        <% if (typeof pendingTenants !== 'undefined' && pendingTenants.length > 0) { %>
+        <% if (typeof pendingTenants !== 'undefined' && pendingTenants && pendingTenants.length > 0) { %>
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm text-left">
               <thead class="bg-eva-dark text-xs font-tech uppercase tracking-[0.15em] text-eva-purple border-b border-eva-purple/30">
@@ -260,7 +311,7 @@
                             <i data-lucide="check" class="w-3.5 h-3.5"></i> APPROVE
                           </button>
                         </form>
-                        <form action="/platform/tenants/<%= t.id %>/reject" method="POST" class="inline" onsubmit="return confirm('Yakin menolak <%= t.name %>?');">
+                        <form action="/platform/tenants/<%= t.id %>/reject" method="POST" class="inline" onsubmit="return confirm('Yakin menolak tenant ini?');">
                           <button type="submit" class="flex items-center gap-1.5 px-4 py-1.5 text-[10px] font-tech font-bold uppercase tracking-widest text-eva-orange bg-eva-panel hover:bg-eva-orange/20 border border-eva-orange clip-mecha transition-all active:scale-95">
                             <i data-lucide="x" class="w-3.5 h-3.5"></i> REJECT
                           </button>
@@ -298,7 +349,7 @@
         
         <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 max-h-[420px]">
           
-          <% if (typeof securityMetrics !== 'undefined' && securityMetrics.suspiciousIPs && securityMetrics.suspiciousIPs.length > 0) { %>
+          <% if (typeof securityMetrics !== 'undefined' && securityMetrics && securityMetrics.suspiciousIPs && securityMetrics.suspiciousIPs.length > 0) { %>
             <!-- Brute Force Warning Block -->
             <div class="bg-eva-orange/10 border border-eva-orange/50 p-3 clip-mecha animate-pulse-slow">
               <div class="flex items-start gap-2">
@@ -313,26 +364,37 @@
             </div>
           <% } %>
 
-          <% if (typeof recentLogs !== 'undefined' && recentLogs.length > 0) { %>
+          <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
             <% recentLogs.forEach(function(log) { 
                 // Color-coding logic for EVA theme
-                let isDanger = log.action.includes('FAILED') || log.action.includes('REJECT') || log.action.includes('DELETE') || log.action.includes('UNAUTHORIZED');
+                const actionStr = (log.action || '').toUpperCase();
+                let isDanger = actionStr.includes('FAILED') || actionStr.includes('REJECT') || actionStr.includes('DELETE') || actionStr.includes('UNAUTHORIZED');
                 let borderClass = isDanger ? 'border-eva-orange' : 'border-eva-purple/30';
                 let textClass = isDanger ? 'text-eva-orange' : 'text-eva-green';
                 let icon = isDanger ? 'alert-triangle' : 'activity';
                 let bgHover = isDanger ? 'hover:bg-eva-orange/5' : 'hover:bg-eva-purple/5';
+                
+                // Safe date formatter fallback jika toWIB tidak tersedia
+                let timeStr = 'UNKNOWN TIME';
+                try {
+                  if (typeof toWIB === 'function') {
+                    timeStr = toWIB(log.created_at);
+                  } else if (log.created_at) {
+                    timeStr = new Date(log.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false });
+                  }
+                } catch(e) { timeStr = 'INVALID DATE'; }
             %>
               <div class="flex gap-3 items-start border-l-2 <%= borderClass %> pl-3 py-1 transition-colors <%= bgHover %>">
                 <div class="mt-1.5">
                   <i data-lucide="<%= icon %>" class="w-3.5 h-3.5 <%= textClass %> <%= isDanger ? 'animate-pulse' : '' %>"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs font-display font-bold text-white uppercase tracking-wider truncate"><%= log.action.replace(/_/g, ' ') %></p>
+                  <p class="text-xs font-display font-bold text-white uppercase tracking-wider truncate"><%= actionStr.replace(/_/g, ' ') %></p>
                   <p class="text-[10px] font-tech text-eva-purple mt-1">
                     ACTOR: <%= log.actor_name || 'SYSTEM' %>
                   </p>
                   <p class="text-[10px] font-tech text-slate-500">
-                    > <%= toWIB(log.created_at) %>
+                    > <%= timeStr %>
                     <% if (log.ip_address) { %>
                       <span class="text-eva-orange/70"> • IP: <%= log.ip_address %></span>
                     <% } %>
@@ -361,7 +423,10 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
+      // Inisialisasi Icon Lucide
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
       
       // Subtle random glitch effect to title for extra EVA vibe
       const title = document.querySelector('h1');
@@ -375,5 +440,8 @@
       }
     });
   </script>
+
+  <!-- Global Script -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

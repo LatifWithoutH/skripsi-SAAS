@@ -1,48 +1,119 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Platform Admin | SIMITRADUDIKA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Platform Admin | SIMITRADUDIKA</title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi & Transisi -->
+  <style>
+    .transition-smooth { transition: all 0.2s ease-in-out; }
+    
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+  </style>
 </head>
-<body class="bg-slate-900 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-4 border-indigo-600">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-slate-800">SIMITRADUDIKA</h1>
-            <p class="text-sm text-slate-500 mt-1">Platform Administrator Access</p>
-        </div>
 
-        <% if (locals.error) { %>
-            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                <%= error %>
-            </div>
-        <% } %>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-4 relative overflow-hidden font-sans text-slate-900 antialiased selection:bg-primary-100 selection:text-primary-700">
+  
+  <!-- Decorative Background Blobs (Subtle untuk background gelap) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary-600/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+  </div>
 
-        <form action="/platform/login" method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Email Admin</label>
-                <input type="email" name="email" required 
-                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                    placeholder="admin@simitradudika.com">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <input type="password" name="password" required 
-                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                    placeholder="••••••••">
-            </div>
-            <button type="submit" 
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md">
-                Masuk ke Dashboard
-            </button>
-        </form>
-
-        <div class="mt-6 text-center">
-            <a href="/" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">
-                ← Kembali ke Halaman Utama Kampus
-            </a>
-        </div>
+  <!-- Login Card -->
+  <div class="bg-white w-full max-w-md p-8 md:p-10 rounded-2xl shadow-2xl border border-slate-200/60 animate-fade-in-up relative z-10">
+    
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <!-- Ikon Shield untuk menandakan akses Platform/Super Admin -->
+      <div class="bg-slate-900 text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-slate-900/20">
+        <i data-lucide="shield" class="w-8 h-8"></i>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Platform Admin</h1>
+      <p class="text-slate-500 text-sm mt-2 leading-relaxed">
+        Akses khusus administrator untuk mengelola seluruh ekosistem dan tenant di SIMITRADUDIKA.
+      </p>
     </div>
+
+    <!-- Error Handling (Dengan EJS Safety Check) -->
+    <% if (typeof locals !== 'undefined' && locals.error) { %>
+      <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3.5 rounded-xl flex items-start gap-3 text-sm animate-fade-in-up">
+        <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="font-semibold mb-0.5">Gagal Masuk</p>
+          <p><%= error %></p>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Form Login -->
+    <form action="/platform/login" method="POST" class="space-y-5">
+      <!-- Email Input -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Admin</label>
+        <div class="relative">
+          <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input 
+            type="email" 
+            name="email" 
+            required 
+            autocomplete="email"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth text-sm placeholder:text-slate-400" 
+            placeholder="admin@simitradudika.com"
+          >
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+        <div class="relative">
+          <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input 
+            type="password" 
+            name="password" 
+            required 
+            autocomplete="current-password"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-smooth text-sm placeholder:text-slate-400" 
+            placeholder="••••••••"
+          >
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full bg-primary-600 text-white font-semibold py-3 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm mt-2">
+        <span>Masuk ke Dashboard</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </form>
+
+    <!-- Footer Info -->
+    <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+      <a href="/" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-primary-600 transition-smooth font-medium">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Halaman Utama
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Inisialisasi Icon Lucide
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
+
+  <!-- Global Script (jika ada fungsi reusable) -->
+  <script src="/js/script.js"></script>
 </body>
 </html>

@@ -1,64 +1,102 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Tim | SaaS Skripsi</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>Kelola Tim | SIMITRADUDIKA</title>
+  
+  <!-- 1. CSS Lokal (Hasil Compile) -->
+  <link href="/css/output.css" rel="stylesheet">
+  
+  <!-- 2. Lucide Lokal -->
+  <script src="/js/lucide.min.js"></script>
+  
+  <!-- 3. Custom Style untuk Animasi & Scrollbar -->
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans">
-  <div class="flex">
+
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-700">
+  <div class="flex min-h-screen">
+    
+    <!-- 1. SIDEBAR PARTIAL -->
     <%- include('../partials/_sidebar', { isTenant: true }) %>
     
+    <!-- 2. MAIN CONTENT AREA -->
     <div class="flex-1 md:ml-64 min-h-screen flex flex-col">
-      <%- include('../partials/_header', { user: user }) %>
+      
+      <!-- HEADER PARTIAL -->
+      <%- include('../partials/_header', { 
+        user: typeof user !== 'undefined' ? user : { name: 'Admin', role: 'super_admin' },
+        tenantName: typeof tenantName !== 'undefined' ? tenantName : 'SIMITRADUDIKA',
+        pageTitle: 'Kelola Tim'
+      }) %>
 
-      <main class="flex-1 p-6 md:p-8">
+      <main class="flex-1 p-4 md:p-8 space-y-6">
+        
         <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Kelola Tim & Akses</h1>
-            <p class="text-gray-500">Atur hak akses, role, dan status akun anggota tim institusi Anda.</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Kelola Tim & Akses</h1>
+            <p class="text-slate-500 text-sm mt-1">Atur hak akses, role, dan status akun anggota tim institusi Anda.</p>
           </div>
           
-          <!-- ✅ PERBAIKAN: Tombol ini sekarang memicu modal, bukan redirect ke dashboard -->
-          <button onclick="toggleInviteModal()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> Undang Tim Baru
-          </button>
+          <!-- Tombol Undang (Dibungkus permission check untuk konsistensi) -->
+          <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:users')) { %>
+            <button onclick="toggleInviteModal()" class="inline-flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 font-semibold text-sm">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Undang Tim Baru
+            </button>
+          <% } %>
         </div>
 
         <!-- Summary Cards (DINAMIS DARI DATABASE) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="users" class="w-6 h-6"></i></div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4 hover:shadow-md hover:border-primary-200 transition-all duration-300 group">
+            <div class="p-3 bg-primary-50 text-primary-600 rounded-xl group-hover:scale-110 transition-transform">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
             <div>
-              <p class="text-sm text-gray-500 font-medium">Total Anggota</p>
-              <p class="text-2xl font-bold text-gray-900"><%= stats.total %></p>
+              <p class="text-sm text-slate-500 font-medium">Total Anggota</p>
+              <p class="text-2xl font-bold text-slate-900"><%= typeof stats !== 'undefined' ? stats.total : '0' %></p>
             </div>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+          
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4 hover:shadow-md hover:border-emerald-200 transition-all duration-300 group">
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
+              <i data-lucide="user-check" class="w-6 h-6"></i>
+            </div>
             <div>
-              <p class="text-sm text-gray-500 font-medium">Akses Aktif</p>
-              <p class="text-2xl font-bold text-gray-900"><%= stats.active %></p>
+              <p class="text-sm text-slate-500 font-medium">Akses Aktif</p>
+              <p class="text-2xl font-bold text-slate-900"><%= typeof stats !== 'undefined' ? stats.active : '0' %></p>
             </div>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="mail-warning" class="w-6 h-6"></i></div>
+          
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center gap-4 hover:shadow-md hover:border-amber-200 transition-all duration-300 group">
+            <div class="p-3 bg-amber-50 text-amber-600 rounded-xl group-hover:scale-110 transition-transform">
+              <i data-lucide="mail-warning" class="w-6 h-6"></i>
+            </div>
             <div>
-              <p class="text-sm text-gray-500 font-medium">Menunggu Konfirmasi</p>
-              <p class="text-2xl font-bold text-gray-900"><%= stats.pending %></p>
+              <p class="text-sm text-slate-500 font-medium">Menunggu Konfirmasi</p>
+              <p class="text-2xl font-bold text-slate-900"><%= typeof stats !== 'undefined' ? stats.pending : '0' %></p>
             </div>
           </div>
         </div>
 
         <!-- Data Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <% if (users && users.length > 0) { %>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+          <% if (typeof users !== 'undefined' && users && users.length > 0) { %>
             <div class="overflow-x-auto">
               <table class="w-full text-sm text-left">
-                <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100 uppercase text-xs tracking-wider">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-xs tracking-wider">
                   <tr>
                     <th class="px-6 py-4">Pengguna</th>
                     <th class="px-6 py-4">Role & Hak Akses</th>
@@ -68,71 +106,83 @@
                     <th class="px-6 py-4 text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
-                  
-                  <% users.forEach(function(u) { %>
-                    <tr class="hover:bg-gray-50 transition-colors <%= u.status === 'pending_invite' ? 'bg-amber-50/30' : '' %>">
+                <tbody class="divide-y divide-slate-100">
+                  <% users.forEach(function(u) { 
+                    const userName = u.name || 'Unknown';
+                    const userInitial = userName.charAt(0).toUpperCase();
+                    const isPending = u.status === 'pending_invite';
+                    const isOwner = u.role_name === 'tenant_owner';
+                  %>
+                    <tr class="hover:bg-slate-50/80 transition-colors <%= isPending ? 'bg-amber-50/40' : '' %>">
                       <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                          <div class="h-9 w-9 <%= u.status === 'pending_invite' ? 'bg-gray-100 text-gray-500' : 'bg-indigo-100 text-indigo-600' %> rounded-full flex items-center justify-center font-bold text-sm">
-                            <%= u.name.charAt(0).toUpperCase() %>
+                          <div class="h-9 w-9 <%= isPending ? 'bg-slate-100 text-slate-500' : 'bg-primary-100 text-primary-600' %> rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                            <%= userInitial %>
                           </div>
-                          <div>
-                            <p class="font-semibold text-gray-900"><%= u.name %></p>
-                            <p class="text-xs text-gray-500"><%= u.email %></p>
+                          <div class="min-w-0">
+                            <p class="font-semibold text-slate-900 truncate"><%= userName %></p>
+                            <p class="text-xs text-slate-500 truncate"><%= u.email || '-' %></p>
                           </div>
                         </div>
                       </td>
                       <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold 
-                          <%= u.role_name === 'tenant_owner' ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-blue-100 text-blue-700 border border-blue-200' %>">
-                          <i data-lucide="<%= u.role_name === 'tenant_owner' ? 'crown' : 'shield' %>" class="w-3 h-3"></i> 
-                          <%= u.role_name ? u.role_name.replace('_', ' ').toUpperCase() : 'UNKNOWN' %>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border 
+                          <%= isOwner ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-primary-50 text-primary-700 border-primary-100' %>">
+                          <i data-lucide="<%= isOwner ? 'crown' : 'shield' %>" class="w-3 h-3"></i> 
+                          <%= u.role_name ? u.role_name.replace(/_/g, ' ').toUpperCase() : 'UNKNOWN' %>
                         </span>
                       </td>
-                      <td class="px-6 py-4 text-gray-600">
-                        <%= u.unit_name ? u.unit_name + ' (' + u.unit_code + ')' : 'Pusat (Semua Unit)' %>
+                      
+                      <!-- ✅ PERBAIKAN DI SINI: Logika HTML dipisah agar tidak di-escape oleh EJS -->
+                      <td class="px-6 py-4 text-sm <%= u.unit_name ? 'text-slate-600' : 'text-slate-400' %>">
+                        <% if (u.unit_name) { %>
+                          <%= u.unit_name %> (<%= u.unit_code %>)
+                        <% } else { %>
+                          Pusat (Semua Unit)
+                        <% } %>
                       </td>
+                      <!-- ✅ AKHIR PERBAIKAN -->
+
                       <td class="px-6 py-4">
                         <% if (u.status === 'active') { %>
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
                           </span>
-                        <% } else if (u.status === 'pending_invite') { %>
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                        <% } else if (isPending) { %>
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">
                             <i data-lucide="clock" class="w-3 h-3"></i> Menunggu
                           </span>
                         <% } else { %>
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                            <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span> <%= u.status %>
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> <%= u.status %>
                           </span>
                         <% } %>
                       </td>
-                      <td class="px-6 py-4 text-gray-500">
+                      <td class="px-6 py-4 text-slate-500 text-sm whitespace-nowrap">
                         <%= new Date(u.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
                       </td>
                       <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-1">
-                          <% if (u.status === 'pending_invite') { %>
+                          <% if (isPending) { %>
                             <form action="/users/<%= u.id %>/activate" method="POST" class="inline" title="Aktifkan User">
-                              <button type="submit" class="p-2 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-colors">
+                              <button type="submit" class="p-2 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-all">
                                 <i data-lucide="check-circle" class="w-4 h-4"></i>
                               </button>
                             </form>
-                            <form action="/users/<%= u.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Yakin ingin membatalkan undangan untuk <%= u.email %>?');" title="Batalkan Undangan">
-                              <button type="submit" class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors">
+                            <form action="/users/<%= u.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Yakin ingin membatalkan undangan ini?');" title="Batalkan Undangan">
+                              <button type="submit" class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                               </button>
                             </form>
-                          <% } else if (u.role_name !== 'tenant_owner') { %>
-                            <button class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit Role">
-                              <i data-lucide="edit-3" class="w-4 h-4"></i>
+                          <% } else if (!isOwner) { %>
+                            <button class="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all" title="Edit Role">
+                              <i data-lucide="pencil" class="w-4 h-4"></i>
                             </button>
-                            <button class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Nonaktifkan Akses">
+                            <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Nonaktifkan Akses">
                               <i data-lucide="user-x" class="w-4 h-4"></i>
                             </button>
                           <% } else { %>
-                            <button class="p-2 text-gray-400 cursor-not-allowed" title="Tidak dapat diubah">
+                            <button class="p-2 text-slate-300 cursor-not-allowed" title="Tidak dapat diubah (Owner)">
                               <i data-lucide="lock" class="w-4 h-4"></i>
                             </button>
                           <% } %>
@@ -140,19 +190,23 @@
                       </td>
                     </tr>
                   <% }); %>
-
                 </tbody>
               </table>
             </div>
           <% } else { %>
-            <!-- Empty State jika belum ada user lain -->
+            <!-- Empty State -->
             <div class="p-12 text-center">
-              <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="users" class="w-8 h-8 text-gray-400"></i>
+              <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="users" class="w-8 h-8 text-slate-400"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Belum ada anggota tim</h3>
-              <p class="text-gray-500 mt-1 mb-4">Mulai undang rekan kerja atau staf fakultas Anda.</p>
-              <button onclick="toggleInviteModal()" class="text-indigo-600 font-semibold hover:underline">Undang Tim Pertama</button>
+              <h3 class="text-lg font-semibold text-slate-900">Belum ada anggota tim</h3>
+              <p class="text-slate-500 text-sm mt-1 mb-6 max-w-sm mx-auto">Mulai undang rekan kerja atau staf fakultas Anda untuk mengelola sistem bersama.</p>
+              
+              <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:users')) { %>
+                <button onclick="toggleInviteModal()" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700 hover:underline transition-colors">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i> Undang Tim Pertama
+                </button>
+              <% } %>
             </div>
           <% } %>
         </div>
@@ -161,19 +215,20 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- MODAL: UNDANG TIM BARU (DITAMBAHKAN DI SINI) -->
+  <!-- MODAL: UNDANG TIM BARU -->
   <!-- ========================================== -->
-  <div id="inviteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all">
+  <% if (typeof can === 'function' && typeof user !== 'undefined' && can(user.role, 'write:users')) { %>
+  <div id="inviteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 transition-opacity duration-300">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all scale-100">
       <!-- Header Modal -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
         <div class="flex items-center gap-3">
-          <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+          <div class="p-2 bg-primary-50 text-primary-600 rounded-lg">
             <i data-lucide="mail-plus" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-lg font-bold text-gray-900">Undang Anggota Tim</h3>
+          <h3 class="text-lg font-bold text-slate-900">Undang Anggota Tim</h3>
         </div>
-        <button onclick="toggleInviteModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+        <button onclick="toggleInviteModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Tutup modal">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -181,92 +236,102 @@
       <!-- Body Modal (Form) -->
       <form action="/team/invite" method="POST" class="p-6 space-y-5">
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email Tim IT / Admin</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Tim IT / Admin <span class="text-red-500">*</span></label>
           <div class="relative">
-            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-            <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="tim.it@kampus.ac.id">
+            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="email" name="email" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm placeholder:text-slate-400" placeholder="tim.it@kampus.ac.id">
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- DROPDOWN ROLE -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Hak Akses (Role)</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Hak Akses (Role) <span class="text-red-500">*</span></label>
             <div class="relative">
-              <select name="role_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
-                <% if (locals.roles && roles.length > 0) { %>
-                  <% roles.forEach(function(role) { %>
+              <select name="role_id" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
+                <% if (typeof locals !== 'undefined' && locals.roles && locals.roles.length > 0) { %>
+                  <% locals.roles.forEach(function(role) { %>
                     <option value="<%= role.id %>">
-                      <%= role.name.replace('_', ' ').toUpperCase() %>
+                      <%= role.name.replace(/_/g, ' ').toUpperCase() %>
                     </option>
                   <% }); %>
+                <% } else { %>
+                  <option value="">Tidak ada role tersedia</option>
                 <% } %>
               </select>
-              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+              <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
             </div>
           </div>
 
           <!-- DROPDOWN UNIT -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Unit / Fakultas (Opsional)</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Unit / Fakultas</label>
             <div class="relative">
-              <select name="unit_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none bg-white">
+              <select name="unit_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-sm appearance-none cursor-pointer">
                 <option value="">Tidak terikat (Akses Seluruh Unit)</option>
-                <% if (locals.units && units.length > 0) { %>
-                  <% units.forEach(function(unit) { %>
+                <% if (typeof locals !== 'undefined' && locals.units && locals.units.length > 0) { %>
+                  <% locals.units.forEach(function(unit) { %>
                     <option value="<%= unit.id %>">
                       <%= unit.name %> (<%= unit.code %>)
                     </option>
                   <% }); %>
                 <% } %>
               </select>
-              <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+              <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
             </div>
           </div>
         </div>
 
         <!-- Info Keamanan -->
-        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 items-start">
-          <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+        <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 flex gap-3 items-start">
+          <i data-lucide="shield-check" class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5"></i>
           <div>
-            <p class="text-sm font-medium text-blue-900">Keamanan Terjamin</p>
-            <p class="text-xs text-blue-700 mt-0.5">User yang diundang terikat pada Tenant ID institusi Anda. Mereka tidak akan bisa melihat atau mengakses data institusi lain.</p>
+            <p class="text-sm font-semibold text-primary-900">Keamanan Multi-Tenant Terjamin</p>
+            <p class="text-xs text-primary-700 mt-1 leading-relaxed">User yang diundang terikat pada <code class="bg-primary-100 px-1 py-0.5 rounded text-primary-800 font-mono text-[10px]">tenant_id</code> institusi Anda. Mereka tidak akan bisa melihat atau mengakses data institusi lain.</p>
           </div>
         </div>
 
         <!-- Footer Modal -->
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-          <button type="button" onclick="toggleInviteModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>
-          <button type="submit" class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <button type="button" onclick="toggleInviteModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">Batal</button>
+          <button type="submit" class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all">
             <i data-lucide="send" class="w-4 h-4"></i> Kirim Undangan
           </button>
         </div>
       </form>
     </div>
   </div>
+  <% } %>
   
-  <!-- SCRIPT UNTUK MODAL -->
+  <!-- SCRIPTS -->
   <script>
     function toggleInviteModal() {
       const modal = document.getElementById('inviteModal');
-      if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+      if (modal) {
+        if (modal.classList.contains('hidden')) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
       }
     }
   
     // Menutup modal jika user mengklik area gelap di luar form (backdrop)
-    document.getElementById('inviteModal').addEventListener('click', function(e) {
+    document.getElementById('inviteModal')?.addEventListener('click', function(e) {
       if (e.target === this) {
         toggleInviteModal();
       }
     });
 
     // Inisialisasi ikon Lucide
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
   </script>
+
+  <!-- Global Script -->
+  <script src="/js/script.js"></script>
 </body>
 </html>
